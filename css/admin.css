@@ -1,0 +1,421 @@
+/* Admin Layout */
+.admin-wrapper {
+    flex-direction: column; /* Stack sidebar and content vertically */
+    min-height: auto;
+    position: static; /* Revert wrapper to static on small screens */
+}
+
+.admin-sidebar {
+    width: 250px;
+    background-color: #f8d5e6; /* Light pink */
+    color: #231942;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start; /* Start at top, let footer float with margin */
+    box-shadow: 2px 0 5px rgba(0,0,0,0.1);
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100vh; /* Fill full viewport height */
+    overflow-y: auto;
+    z-index: 1000;
+    border-right: 1px solid rgba(0,0,0,0.05);
+}
+
+.admin-page-content {
+    background: rgba(255,255,255,0.92); /* Subtle white overlay for content */
+    padding: 20px 20px 20px 300px;
+    border-radius: 18px;
+    box-shadow: 0 6px 32px rgba(94, 84, 142, 0.10);
+    margin: 32px 32px 32px 0;
+    /* Remove left padding if needed for alignment */
+}
+
+/* Remove top margin from the first element inside admin-page-content */
+.admin-page-content > :first-child {
+    margin-top: 0;
+}
+
+/* Sidebar Header */
+.sidebar-header {
+    text-align: center;
+    margin-bottom: 30px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+    color: #5E548E;
+    font-size: 1.5em;
+    font-weight: bold; /* Make header bold */
+    text-transform: uppercase; /* Uppercase for header */
+}
+
+.sidebar-header h3 {
+    color: inherit;
+    margin: 0;
+    font-size: 1em;
+}
+
+/* Sidebar Menu */
+.sidebar-menu {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    flex-grow: 1;
+}
+
+.sidebar-menu li {
+    margin-bottom: 18px; /* More space between links */
+}
+
+.sidebar-menu a {
+    color: #5E548E;
+    background: none;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    padding: 18px 20px;
+    border-radius: 12px;
+    font-size: 1.18em;
+    font-weight: 500;
+    letter-spacing: 0.5px;
+    transition: background 0.2s, color 0.2s, box-shadow 0.2s;
+    margin-bottom: 8px;
+    box-shadow: none;
+}
+
+.sidebar-menu a i {
+    margin-right: 14px;
+    font-size: 1.25em;
+}
+
+.sidebar-menu a:hover,
+.sidebar-menu a.active {
+    background: #be95c4;
+    color: #231942;
+    font-weight: 700;
+    box-shadow: 0 2px 8px #b8a8f244;
+}
+
+.sidebar-menu a.active {
+    border-left: 3px solid #3498db; /* Accent border for active link */
+    padding-left: 12px; /* Adjust padding to compensate for border */
+}
+
+/* Sidebar Footer */
+.sidebar-footer {
+    margin-top: auto;
+    text-align: center;
+    padding-top: 18px;
+    border-top: 1px solid #e0b1cb;
+    background: linear-gradient(to top, #f8d5e6 90%, transparent 100%);
+    margin-bottom: 32px; /* Add space below the logout button */
+}
+
+.sidebar-footer a {
+    color: #5E548E;
+    text-decoration: none;
+    display: inline-block;
+    padding: 14px 24px;
+    border-radius: 8px;
+    font-size: 1.1em;
+    font-weight: 600;
+    margin-top: 6px;
+    transition: background 0.3s, color 0.3s;
+}
+
+.sidebar-footer a:hover {
+    background-color: #e0b1cb;
+    color: #231942;
+}
+
+.sidebar-footer a i {
+    margin-right: 5px;
+}
+
+/* Page Title */
+.admin-page-content h1.page-title {
+    color: #5E548E;
+    /* margin-top: 0; Ensure page title starts at the top - Handled by :first-child rule */
+    margin-bottom: 20px;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 10px;
+}
+
+/* KPI Cards */
+.kpi-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+    margin-bottom: 30px;
+}
+
+.kpi-card {
+    background-color: #fff;
+    border-radius: 8px;
+    padding: 20px;
+    display: flex;
+    align-items: center;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    border-left: 5px solid #be95c4; /* Default accent color (soft purple) */
+}
+
+.kpi-card:nth-child(1) { border-left-color: #be95c4; } /* Soft purple */
+.kpi-card:nth-child(2) { border-left-color: #e0b1cb; } /* Pink */
+.kpi-card:nth-child(3) { border-left-color: #b8a8f2; } /* Lavender */
+
+.card-icon {
+    font-size: 2.5em;
+    margin-right: 20px;
+    color: #be95c4; /* Match first card color */
+}
+.kpi-card:nth-child(2) .card-icon { color: #e0b1cb; }
+.kpi-card:nth-child(3) .card-icon { color: #b8a8f2; }
+
+.card-details {
+    flex-grow: 1;
+}
+
+.card-value {
+    font-size: 2em;
+    font-weight: bold;
+    color: #555;
+}
+
+.card-label {
+    font-size: 0.9em;
+    color: #777;
+    text-transform: uppercase;
+}
+
+/* Admin Section Titles */
+.admin-section h2 {
+    color: #5E548E;
+    margin-top: 30px;
+    margin-bottom: 15px;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 8px;
+}
+
+/* Admin Tables */
+.admin-table-container {
+    overflow-x: auto; /* Add horizontal scroll on small screens */
+}
+
+.admin-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 20px;
+}
+
+.admin-table th,
+.admin-table td {
+    padding: 12px 15px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+}
+
+.admin-table th {
+    background-color: #f3e9fa;
+    color: #5E548E;
+    font-weight: bold;
+}
+
+.admin-table tbody tr:nth-child(even) {
+    background-color: #f8f4fa;
+}
+
+.admin-table tbody tr:hover {
+    background-color: #e0b1cb22;
+}
+
+.admin-table td .button.small {
+    padding: 5px 10px;
+    font-size: 0.8em;
+    margin-right: 5px; /* Space between buttons */
+}
+
+.product-info-cell {
+    display: flex;
+    align-items: center;
+}
+
+.product-thumbnail {
+    width: 40px;
+    height: 40px;
+    object-fit: cover;
+    margin-right: 10px;
+    border-radius: 4px;
+}
+
+/* Responsive Admin Layout */
+@media (max-width: 992px) {
+    body.admin-page {
+        padding-left: 0; /* Remove padding on smaller screens */
+    }
+
+    .admin-wrapper {
+        flex-direction: column; /* Stack sidebar and content vertically */
+        min-height: auto;
+        position: static; /* Revert wrapper to static on small screens */
+    }
+
+    .admin-sidebar {
+        position: static; /* Revert to static position */
+        width: 100%; /* Full width */
+        height: auto; /* Auto height */
+        flex-direction: row; /* Arrange items horizontally */
+        justify-content: space-around;
+        border-right: none; /* Remove border */
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1); /* Add bottom shadow */
+        padding: 10px; /* Adjusted padding */
+        overflow-y: visible; /* Disable scrolling */
+    }
+
+    .admin-sidebar .sidebar-header {
+        display: none; /* Hide header on small screens */
+    }
+
+    .sidebar-menu {
+        flex-direction: row; /* Horizontal menu */
+        flex-wrap: wrap;
+        justify-content: center;
+        flex-grow: 0; /* Don't grow */
+    }
+
+    .sidebar-menu li {
+        margin-bottom: 0; /* Remove bottom margin */
+        margin-right: 15px; /* Add space between horizontal items */
+    }
+
+     .sidebar-menu li:last-child {
+         margin-right: 0;
+     }
+
+    .sidebar-menu a {
+        padding: 8px 15px; /* Adjusted padding */
+        justify-content: center; /* Center text/icon */
+        flex-direction: column; /* Stack icon and text vertically if needed */
+        text-align: center;
+    }
+
+    .sidebar-menu a i {
+        margin-right: 0; /* Remove icon margin */
+        margin-bottom: 5px; /* Add space below icon */
+    }
+
+     .sidebar-menu a.active {
+         border-left: none; /* Remove left border */
+         border-bottom: 3px solid #3498db; /* Add bottom border for active */
+         padding-left: 15px; /* Reset padding */
+          padding-bottom: 5px; /* Add padding bottom */
+     }
+
+    .sidebar-footer {
+        display: none; /* Hide footer on small screens */
+    }
+
+    .admin-page-content {
+        padding: 20px 20px 20px 300px;
+    }
+
+    .kpi-cards {
+        grid-template-columns: 1fr; /* Stack KPI cards */
+    }
+
+     .admin-table th,
+     .admin-table td {
+         padding: 10px;
+     }
+}
+
+/* Modals */
+.modal {
+    display: none; /* Hidden by default */
+    position: fixed; /* Stay in place */
+    z-index: 1000; /* Sit on top */
+    left: 0;
+    top: 0;
+    width: 100%; /* Full width */
+    height: 100%; /* Full height */
+    overflow: auto; /* Enable scroll if needed */
+    background-color: rgba(0,0,0,0.5); /* Black w/ opacity */
+    padding-top: 60px; /* Place the modal content 60px from the top */
+}
+
+.modal-content {
+    background-color: #fefefe;
+    margin: 5% auto; /* 15% from the top and centered */
+    padding: 20px;
+    border-radius: 8px;
+    width: 90%; /* Could be more responsive */
+    max-width: 600px; /* Max width for larger screens */
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    position: relative;
+}
+
+.modal-content h3 {
+    margin-top: 0;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 10px;
+    margin-bottom: 20px;
+}
+
+.modal .close-button {
+    color: #aaa;
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    font-size: 28px;
+    font-weight: bold;
+}
+
+.modal .close-button:hover,
+.modal .close-button:focus {
+    color: #000;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+/* Modal Forms */
+.modal-content form .form-group {
+    margin-bottom: 15px;
+}
+
+.modal-content form label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+    color: #555;
+}
+
+.modal-content form input[type="text"],
+.modal-content form input[type="number"],
+.modal-content form input[type="email"],
+.modal-content form input[type="password"],
+.modal-content form select,
+.modal-content form textarea {
+    width: calc(100% - 22px); /* Adjust for padding and border */
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 1em;
+}
+
+.modal-content form textarea {
+    resize: vertical; /* Allow vertical resize */
+    min-height: 100px;
+}
+
+.modal-content form button[type="submit"] {
+    margin-top: 15px;
+    /* Styles for buttons are already in style.css, ensure they look good */
+}
+
+/* Style for current product image in edit modal */
+#current-product-image img {
+    display: block;
+    margin-top: 10px;
+    border: 1px solid #eee;
+    padding: 5px;
+    background-color: #fff;
+} 
