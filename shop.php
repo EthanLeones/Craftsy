@@ -98,7 +98,7 @@ try {
     .sidebar a {
         display: block;
         padding: 12px 16px;
-        background: linear-gradient(90deg, #e0b1cb 0%, #be95c4 100%);
+        background: #e0b1cb; /* Removed gradient, now solid color */
         color: #231942;
         text-decoration: none;
         border-radius: 7px;
@@ -110,7 +110,7 @@ try {
     }
 
     .sidebar a:hover, .sidebar a.active {
-        background: linear-gradient(90deg, #9f86c0 0%, #5e548e 100%);
+        background: #9f86c0; /* Removed gradient, now solid color */
         color: #fff;
         font-weight: bold;
     }
