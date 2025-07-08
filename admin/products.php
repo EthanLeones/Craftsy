@@ -1,24 +1,15 @@
 <?php
 $page_title = 'Product Management';
 include 'includes/admin_header.php';
-// include 'includes/admin_sidebar.php'; // Sidebar will be included within admin-wrapper
 
-// Admin authentication check should be placed here or in admin_header.php
-// require_once '../includes/session.php';
-// requireAdminLogin();
-
-require_once '../config/database.php'; // Include database connection
+require_once '../config/database.php';
 
 $products = [];
 $categories = [];
 $error_message = null;
 
-// --- Data Fetching Logic ---
-
 try {
     $conn = getDBConnection();
-    
-    // Fetch products with category names (using the new 'category' column)
     $stmt_products = $conn->prepare("
         SELECT p.* 
         FROM products p 
@@ -27,7 +18,6 @@ try {
     $stmt_products->execute();
     $products = $stmt_products->fetchAll(PDO::FETCH_ASSOC);
 
-    // Define static categories as the categories table will be dropped
     $categories = [
         ['id' => 1, 'name' => 'Classic'],
         ['id' => 2, 'name' => 'Pouch'],
@@ -371,4 +361,4 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
 });
-</script> 
+</script>

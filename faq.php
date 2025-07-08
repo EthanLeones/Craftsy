@@ -38,7 +38,6 @@
             </div>
         </div>
 
-        <!-- Add more FAQ items as needed -->
 
 </div> <!-- Close container from header.php -->
 

@@ -5,7 +5,7 @@ requireLogin();
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     $_SESSION['alert'] = ['type' => 'error', 'message' => 'Invalid request method.'];
-    header('Location: profile.php'); // Redirect if not a POST request
+    header('Location: profile.php'); 
     exit();
 }
 
@@ -20,7 +20,6 @@ $country = $_POST['country'] ?? '';
 $contact_number = $_POST['contact_number'] ?? '';
 $is_default = isset($_POST['is_default']) ? 1 : 0;
 
-// Basic validation
 if ($address_id === null || empty($address_line1) || empty($city) || empty($state_province) || empty($postal_code) || empty($country) || empty($contact_number)) {
     $_SESSION['alert'] = ['type' => 'error', 'message' => 'Please fill in all required address fields.'];
     header('Location: profile.php');
@@ -30,7 +29,6 @@ if ($address_id === null || empty($address_line1) || empty($city) || empty($stat
 $conn = getDBConnection();
 
 try {
-    // Verify that the address belongs to the current user
     $stmt_check = $conn->prepare("SELECT id FROM user_addresses WHERE id = ? AND user_id = ?");
     $stmt_check->execute([$address_id, $user_id]);
     if ($stmt_check->rowCount() === 0) {
@@ -39,13 +37,11 @@ try {
         exit();
     }
 
-    // If setting as default, unset the current default address for this user
     if ($is_default) {
         $stmt_unset_default = $conn->prepare("UPDATE user_addresses SET is_default = 0 WHERE user_id = ? AND is_default = 1");
         $stmt_unset_default->execute([$user_id]);
     }
 
-    // Update the address
     $stmt = $conn->prepare("UPDATE user_addresses SET address_line1 = ?, address_line2 = ?, city = ?, state_province = ?, postal_code = ?, country = ?, contact_number = ?, is_default = ? WHERE id = ?");
     $stmt->execute([$address_line1, $address_line2, $city, $state_province, $postal_code, $country, $contact_number, $is_default, $address_id]);
 

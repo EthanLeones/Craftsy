@@ -1,15 +1,8 @@
 <?php
 require_once '../config/database.php';
-require_once '../includes/session.php'; // Assuming session is used for admin login
+require_once '../includes/session.php'; 
 
 header('Content-Type: application/json');
-
-// Admin authentication check
-// requireAdminLogin(); // Implement this function
-// if (!isAdmin()) {
-//     echo json_encode(['success' => false, 'message' => 'Unauthorized access.']);
-//     exit();
-// }
 
 $product_id = $_GET['id'] ?? null;
 

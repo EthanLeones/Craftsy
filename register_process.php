@@ -9,7 +9,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $password = $_POST['password'] ?? '';
     $confirm_password = $_POST['confirm_password'] ?? '';
 
-    // Basic validation
     if (empty($name) || empty($username) || empty($email) || empty($password) || empty($confirm_password)) {
         $_SESSION['alert'] = ['type' => 'error', 'message' => 'All fields are required.'];
         header('Location: register.php');
@@ -39,7 +38,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     try {
         $conn = getDBConnection();
 
-        // Check if username or email already exists
         $stmt = $conn->prepare("SELECT COUNT(*) FROM users WHERE username = ? OR email = ?");
         $stmt->execute([$username, $email]);
         $count = $stmt->fetchColumn();
@@ -50,33 +48,27 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             exit();
         }
 
-        // Insert new user
-        // Default role to 'customer' to match database schema
         $stmt = $conn->prepare("INSERT INTO users (name, username, email, password, role) VALUES (?, ?, ?, ?, 'customer')");
         $stmt->execute([$name, $username, $email, $hashed_password]);
         
-        // Log successful registration
         error_log("User registered successfully: " . $username);
 
-        // Registration successful - redirect to login
          $_SESSION['alert'] = ['type' => 'success', 'message' => 'Registration successful! Please login.'];
         header('Location: login.php');
         exit();
 
     } catch (PDOException $e) {
-        // Log detailed error information
         error_log("Registration error details: " . $e->getMessage());
         error_log("SQL State: " . $e->getCode());
         error_log("Error Info: " . print_r($e->errorInfo, true));
         
         $_SESSION['alert'] = ['type' => 'error', 'message' => 'An unexpected error occurred during registration.'];
-        header('Location: error.php'); // Redirect to a generic error page for database errors
+        header('Location: error.php');
         exit();
     }
 
 } else {
-    // Invalid request method
      $_SESSION['alert'] = ['type' => 'error', 'message' => 'Invalid request method.'];
     header('Location: register.php');
     exit();
-} 
+}

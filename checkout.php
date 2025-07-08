@@ -130,7 +130,7 @@ document.addEventListener('DOMContentLoaded', function() {
     function toggleProofOfPayment() {
         const selectedMethod = document.querySelector('input[name="payment_method"]:checked').value;
         
-        // Check if elements exist before accessing style
+    
         if (proofOfPaymentGroup) {
             if (selectedMethod === 'bank_transfer' || selectedMethod === 'gcash') {
                 proofOfPaymentGroup.style.display = 'block';
@@ -139,7 +139,7 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         }
 
-        // Toggle payment instructions images
+
         if (selectedMethod === 'gcash') {
             if (gcashInstructions) gcashInstructions.style.display = 'block';
             if (bpiInstructions) bpiInstructions.style.display = 'none';
@@ -152,17 +152,14 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    // Add event listeners to payment method radios
     paymentMethodRadios.forEach(radio => {
         radio.addEventListener('change', toggleProofOfPayment);
     });
 
-    // Initial check on page load
     toggleProofOfPayment();
 });
 </script>
 
 <?php
-// Check for session alert message and display as JavaScript alert
-// ... existing code ...
+
 ?> 

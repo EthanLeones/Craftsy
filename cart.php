@@ -13,18 +13,13 @@ $user_id = getCurrentUserId();
 if ($user_id) {
     try {
         $conn = getDBConnection();
-
-        // Fetch cart items for the current user, joining with products table
         $stmt = $conn->prepare("SELECT c.*, p.name, p.price, p.image_url FROM cart c JOIN products p ON c.product_id = p.id WHERE c.user_id = ?");
         $stmt->execute([$user_id]);
         $cart_items = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-        // Calculate total amount
         $total_amount = array_sum(array_map(function($item) { return $item['price'] * $item['quantity']; }, $cart_items));
 
     } catch (PDOException $e) {
         error_log("Error fetching cart items: " . $e->getMessage());
-        // Handle error gracefully
     }
 }
 
@@ -82,7 +77,6 @@ document.addEventListener('DOMContentLoaded', function() {
     const cartItemsContainer = document.querySelector('.cart-items');
     const cartTotalAmountSpan = document.getElementById('cart-total-amount');
 
-    // Function to update cart item total and overall total
     function updateCartTotals() {
         let newTotalAmount = 0;
         document.querySelectorAll('.cart-item').forEach(itemElement => {
@@ -101,7 +95,6 @@ document.addEventListener('DOMContentLoaded', function() {
         });
         cartTotalAmountSpan.textContent = 'P' + newTotalAmount.toFixed(2);
 
-        // Show/hide checkout button based on total amount
         const checkoutButton = document.querySelector('.cart-actions .primary');
         if (newTotalAmount > 0) {
             checkoutButton.style.display = 'inline-block';
@@ -110,7 +103,6 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    // Event listener for quantity changes
     cartItemsContainer.addEventListener('change', function(event) {
         if (event.target.classList.contains('quantity-input')) {
             const quantityInput = event.target;
@@ -136,30 +128,26 @@ document.addEventListener('DOMContentLoaded', function() {
                          if (cartCountSpan && data.cart_count !== undefined) {
                               cartCountSpan.textContent = data.cart_count;
                          }
-                        // If quantity became 0, remove the item element
+                
                         if (newQuantity === 0) {
                             itemElement.remove();
                         }
                     } else {
                         alert('Failed to update cart: ' + data.message);
-                        // Revert quantity input on failure
-                        // You might need to store the original quantity before the change
-                        location.reload(); // Simple reload for now on failure
+                        location.reload(); 
                     }
                 })
                 .catch(error => {
                     console.error('Error:', error);
                     alert('An error occurred while updating the cart.');
-                    location.reload(); // Simple reload for now on error
+                    location.reload();
                 });
             } else {
                 alert('Please enter a valid quantity.');
-                location.reload(); // Simple reload for now on invalid input
+                location.reload(); 
             }
         }
     });
-
-    // Event listener for remove button clicks
     cartItemsContainer.addEventListener('click', function(event) {
         if (event.target.classList.contains('remove-item')) {
             const removeButton = event.target;
@@ -178,8 +166,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 .then(data => {
                     if (data.success) {
                         console.log('Item removed successfully:', data.message);
-                        itemElement.remove(); // Remove the item element from the DOM
-                        updateCartTotals(); // Update totals after removing item
+                        itemElement.remove();
+                        updateCartTotals(); 
                         const cartCountSpan = document.querySelector('.header-icons .cart-count');
                          if (cartCountSpan && data.cart_count !== undefined) {
                               cartCountSpan.textContent = data.cart_count;
@@ -195,8 +183,6 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         }
     });
-
-    // Initial calculation of totals on page load
-    updateCartTotals(); // Call initially to set correct total and button state
+    updateCartTotals(); 
 });
 </script> 

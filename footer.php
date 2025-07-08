@@ -29,7 +29,6 @@
          <p>&copy; 2023 Craftsy Nook. All rights reserved.</p>
      </div>
 
-<!-- Toast Notification Container -->
 <div id="toast-container" style="position: fixed; top: 24px; right: 24px; z-index: 9999;"></div>
 <script>
 function showToast(message, type = 'success', duration = 3000) {

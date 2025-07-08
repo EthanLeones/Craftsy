@@ -2,7 +2,7 @@
 require_once 'includes/session.php';
 require_once 'config/database.php';
 
-header('Content-Type: application/json'); // Indicate JSON response
+header('Content-Type: application/json'); 
 
 $response = ['success' => false, 'message' => 'An error occurred.'];
 
@@ -26,25 +26,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     try {
         $conn = getDBConnection();
 
-        // Check if product exists in cart for this user
+       
         $stmt = $conn->prepare("SELECT * FROM cart WHERE user_id = ? AND product_id = ?");
         $stmt->execute([$user_id, $product_id]);
         $cart_item = $stmt->fetch();
 
         if ($cart_item) {
-            // Item exists, update quantity
             $new_quantity = $cart_item['quantity'] + $quantity;
             $stmt = $conn->prepare("UPDATE cart SET quantity = ? WHERE user_id = ? AND product_id = ?");
             $stmt->execute([$new_quantity, $user_id, $product_id]);
         } else {
-            // Item does not exist, insert new item
             $stmt = $conn->prepare("INSERT INTO cart (user_id, product_id, quantity) VALUES (?, ?, ?)");
             $stmt->execute([$user_id, $product_id, $quantity]);
         }
 
         $response['success'] = true;
         $response['message'] = 'Product added to cart!';
-        // Optionally, return updated cart count
         $response['cart_count'] = getCartCount();
 
     } catch (PDOException $e) {

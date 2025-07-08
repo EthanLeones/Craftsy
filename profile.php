@@ -13,19 +13,16 @@ if ($user_id) {
     try {
         $conn = getDBConnection();
         
-        // Fetch user data
         $stmt = $conn->prepare("SELECT id, username, name, email FROM users WHERE id = ?");
         $stmt->execute([$user_id]);
         $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
-        // Fetch user addresses
         $stmt_addresses = $conn->prepare("SELECT * FROM user_addresses WHERE user_id = ? ORDER BY is_default DESC, id DESC");
         $stmt_addresses->execute([$user_id]);
         $user_addresses = $stmt_addresses->fetchAll(PDO::FETCH_ASSOC);
 
     } catch (PDOException $e) {
         error_log("Error fetching user profile or addresses: " . $e->getMessage());
-        // Handle error gracefully
     }
 }
 
@@ -50,7 +47,6 @@ if ($user_id) {
                         <label for="email">Email:</label>
                         <input type="email" id="email" name="email" value="<?php echo htmlspecialchars($user['email']); ?>" required>
                     </div>
-                    <!-- Add more fields as needed (e.g., contact) -->
                     
                     <h3>Change Password</h3>
                     <div class="form-group">
@@ -154,8 +150,7 @@ document.addEventListener('DOMContentLoaded', function() {
     cancelAddAddressButton.addEventListener('click', function() {
         addAddressForm.style.display = 'none';
         addAddressButton.style.display = 'block';
-        // Optionally clear form fields here
          addAddressForm.querySelector('form').reset();
     });
 });
-</script> 
+</script>

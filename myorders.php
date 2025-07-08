@@ -12,14 +12,12 @@ if ($user_id) {
     try {
         $conn = getDBConnection();
 
-        // Fetch orders for the current user, ordered by creation date
         $stmt = $conn->prepare("SELECT * FROM orders WHERE user_id = ? ORDER BY created_at DESC");
         $stmt->execute([$user_id]);
         $orders = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
     } catch (PDOException $e) {
         error_log("Error fetching user orders: " . $e->getMessage());
-        // Handle error gracefully
     }
 }
 

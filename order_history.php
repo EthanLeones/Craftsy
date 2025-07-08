@@ -2,7 +2,7 @@
 require_once 'includes/session.php';
 require_once 'config/database.php';
 
-requireLogin(); // Ensure the user is logged in
+requireLogin();
 
 $page_title = 'Order History';
 include 'header.php';
@@ -13,7 +13,6 @@ $orders = [];
 try {
     $conn = getDBConnection();
 
-    // Fetch all orders for the current user
     $stmt_orders = $conn->prepare("SELECT id, order_date, total_amount, status FROM orders WHERE user_id = ? ORDER BY order_date DESC");
     $stmt_orders->execute([$user_id]);
     $orders = $stmt_orders->fetchAll(PDO::FETCH_ASSOC);
@@ -30,14 +29,14 @@ try {
         max-width: 900px;
         margin: 20px auto;
         padding: 20px;
-        background-color: #fff; /* White background */
+        background-color: #fff; 
         border-radius: 8px;
         box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     }
 
     .order-history-container h1 {
         text-align: center;
-        color: #231942; /* Primary dark color */
+        color: #231942; 
         margin-bottom: 20px;
     }
 
@@ -50,25 +49,25 @@ try {
     .order-history-container th, .order-history-container td {
         padding: 12px;
         text-align: left;
-        border-bottom: 1px solid #e0b1cb; /* Light pink border */
+        border-bottom: 1px solid #e0b1cb; 
     }
 
     .order-history-container th {
-        background-color: #5e548e; /* Medium purple color */
+        background-color: #5e548e; 
         color: white;
         font-weight: bold;
     }
 
     .order-history-container tbody tr:nth-child(even) {
-        background-color: #f8f4fa; /* Very light purple for stripe effect */
+        background-color: #f8f4fa; 
     }
 
     .order-history-container tbody tr:hover {
-        background-color: #e0b1cb; /* Light pink on hover */
+        background-color: #e0b1cb;
     }
 
     .order-history-container td a {
-        color: #9f86c0; /* Medium purple link color */
+        color: #9f86c0; 
         text-decoration: none;
     }
 
@@ -79,7 +78,7 @@ try {
     .order-history-container .button {
          display: inline-block;
          padding: 10px 20px;
-         background-color: #9f86c0; /* Medium purple */
+         background-color: #9f86c0;
          color: white;
          text-decoration: none;
          border-radius: 5px;
@@ -88,7 +87,7 @@ try {
     }
 
     .order-history-container .button:hover {
-        background-color: #5e548e; /* Darker purple on hover */
+        background-color: #5e548e;
     }
 
 
@@ -131,6 +130,5 @@ try {
 <?php include 'footer.php'; ?>
 
 <?php
-// Check for session alert message and display as JavaScript alert
-// ... existing code ...
+
 ?> 

@@ -1,22 +1,17 @@
 <?php
 $page_title = 'Customer Inquiries';
 include 'includes/admin_header.php';
-// include 'includes/admin_sidebar.php'; // Sidebar will be included within admin-wrapper
 
-// Admin authentication check should be placed here or in admin_header.php
-// require_once '../includes/session.php';
-// requireAdminLogin();
-
-require_once '../config/database.php'; // Include database connection
+require_once '../config/database.php'; 
 
 $conn = getDBConnection();
 
-// Fetch all threads with user info
+
 $stmt_threads = $conn->prepare("SELECT t.*, u.name as customer_name, u.username FROM inquiry_threads t JOIN users u ON t.user_id = u.id ORDER BY t.updated_at DESC, t.created_at DESC");
 $stmt_threads->execute();
 $threads = $stmt_threads->fetchAll(PDO::FETCH_ASSOC);
 
-// Determine selected thread
+
 $selected_thread_id = isset($_GET['thread_id']) ? intval($_GET['thread_id']) : ($threads[0]['id'] ?? null);
 $selected_thread = null;
 $messages = [];
@@ -27,7 +22,6 @@ if ($selected_thread_id) {
             break;
         }
     }
-    // Fetch messages for the selected thread
     $stmt = $conn->prepare("SELECT m.*, u.name as sender_name, u.role as sender_role FROM inquiry_messages m JOIN users u ON m.sender_id = u.id WHERE m.thread_id = ? ORDER BY m.created_at ASC");
     $stmt->execute([$selected_thread_id]);
     $messages = $stmt->fetchAll(PDO::FETCH_ASSOC);

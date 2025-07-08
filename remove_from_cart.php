@@ -2,7 +2,7 @@
 require_once 'includes/session.php';
 require_once 'config/database.php';
 
-header('Content-Type: application/json'); // Indicate JSON response
+header('Content-Type: application/json'); 
 
 $response = ['success' => false, 'message' => 'An error occurred.'];
 

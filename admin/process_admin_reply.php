@@ -19,10 +19,8 @@ if (!$thread_id || $message === '') {
 
 try {
     $conn = getDBConnection();
-    // Insert message
     $stmt = $conn->prepare("INSERT INTO inquiry_messages (thread_id, sender_id, message) VALUES (?, ?, ?)");
     $stmt->execute([$thread_id, $admin_id, $message]);
-    // Update thread updated_at
     $stmt2 = $conn->prepare("UPDATE inquiry_threads SET updated_at = NOW() WHERE id = ?");
     $stmt2->execute([$thread_id]);
     echo json_encode(['success' => true, 'message' => 'Reply sent.']);

@@ -1,16 +1,8 @@
 <?php
 require_once '../config/database.php';
-require_once '../includes/session.php'; // Assuming session is used for admin login
+require_once '../includes/session.php';
 
 header('Content-Type: application/json');
-
-// Admin authentication check
-// requireAdminLogin(); // Implement this function
-// $admin_name = 'Admin User'; // Replace with fetching actual admin user name
-// if (!isAdmin()) {
-//     echo json_encode(['success' => false, 'message' => 'Unauthorized access.']);
-//     exit();
-// }
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     echo json_encode(['success' => false, 'message' => 'Invalid request method.']);
@@ -20,41 +12,35 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 $inquiry_id = $_POST['inquiry_id'] ?? null;
 $reply_text = trim($_POST['reply_text'] ?? '');
 
-// Basic Validation
 if ($inquiry_id === null || !is_numeric($inquiry_id) || empty($reply_text)) {
     echo json_encode(['success' => false, 'message' => 'Missing required fields.']);
     exit();
 }
 
 $inquiry_id = (int)$inquiry_id;
-$responded_by = $admin_name ?? 'Admin'; // Use fetched admin name or default to 'Admin'
+$responded_by = $admin_name ?? 'Admin';
 
 $conn = getDBConnection();
 
 try {
-    // Start transaction
     $conn->beginTransaction();
 
-    // Insert the reply into inquiry_responses table
     $stmt_insert_reply = $conn->prepare("INSERT INTO inquiry_responses (inquiry_id, response_text, responded_by, responded_at) VALUES (?, ?, ?, NOW())");
     $stmt_insert_reply->execute([$inquiry_id, $reply_text, $responded_by]);
 
-    // Update the status of the inquiry to 'replied'
     $stmt_update_status = $conn->prepare("UPDATE inquiries SET status = 'replied' WHERE id = ?");
     $stmt_update_status->execute([$inquiry_id]);
 
-    // Commit the transaction
     $conn->commit();
 
     echo json_encode(['success' => true, 'message' => 'Reply sent successfully!']);
 
 } catch (PDOException $e) {
-    // Roll back the transaction on error
      if ($conn->inTransaction()) {
          $conn->rollBack();
      }
     error_log("Process reply inquiry error: " . $e->getMessage());
-    echo json_encode(['success' => false, 'message' => 'Database error: ' . $e->getMessage()]); // Provide a generic error in production
+    echo json_encode(['success' => false, 'message' => 'Database error: ' . $e->getMessage()]);
 }
 
-?> 
+?>

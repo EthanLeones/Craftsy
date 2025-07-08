@@ -2,7 +2,7 @@
 require_once 'includes/session.php';
 require_once 'config/database.php';
 
-requireLogin(); // Ensure the user is logged in
+requireLogin();
 
 $page_title = 'Order Confirmation';
 include 'header.php';
@@ -13,7 +13,6 @@ $order = null;
 $order_items = [];
 
 if (!$order_id) {
-    // Redirect if no order ID is provided
     $_SESSION['alert'] = ['type' => 'danger', 'message' => 'No order specified.'];
     header('Location: index.php'); // Or wherever appropriate
     exit();
@@ -22,19 +21,16 @@ if (!$order_id) {
 try {
     $conn = getDBConnection();
 
-    // Fetch order details for the current user
     $stmt_order = $conn->prepare("SELECT * FROM orders WHERE id = ? AND user_id = ?");
     $stmt_order->execute([$order_id, $user_id]);
     $order = $stmt_order->fetch(PDO::FETCH_ASSOC);
 
     if (!$order) {
-        // Redirect if order not found or doesn't belong to the user
         $_SESSION['alert'] = ['type' => 'danger', 'message' => 'Order not found or you do not have permission to view it.'];
-        header('Location: order_history.php'); // Redirect to order history
+        header('Location: order_history.php'); 
         exit();
     }
 
-    // Fetch order items
     $stmt_items = $conn->prepare("SELECT oi.*, p.name, p.image_url FROM order_items oi JOIN products p ON oi.product_id = p.id WHERE oi.order_id = ?");
     $stmt_items->execute([$order_id]);
     $order_items = $stmt_items->fetchAll(PDO::FETCH_ASSOC);
@@ -42,7 +38,7 @@ try {
 } catch (PDOException $e) {
     error_log("Error fetching order confirmation data: " . $e->getMessage());
     $_SESSION['alert'] = ['type' => 'danger', 'message' => 'An error occurred while loading order details.'];
-     header('Location: index.php'); // Or wherever appropriate
+     header('Location: index.php'); 
      exit();
 }
 
@@ -89,6 +85,4 @@ Contact: <?php echo htmlspecialchars($order['shipping_contact_number']); ?></pre
 <?php include 'footer.php'; ?>
 
 <?php
-// Check for session alert message and display as JavaScript alert
-// ... existing code ...
 ?> 

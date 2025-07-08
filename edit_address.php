@@ -10,13 +10,13 @@ $address_id = $_GET['id'] ?? null;
 if ($address_id && $user_id) {
     try {
         $conn = getDBConnection();
-        // Fetch address for the current user and specific address ID
+
         $stmt = $conn->prepare("SELECT * FROM user_addresses WHERE id = ? AND user_id = ?");
         $stmt->execute([$address_id, $user_id]);
         $address = $stmt->fetch(PDO::FETCH_ASSOC);
     } catch (PDOException $e) {
         error_log("Error fetching address for edit: " . $e->getMessage());
-        // Handle error gracefully
+
     }
 }
 

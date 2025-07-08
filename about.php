@@ -4,56 +4,55 @@
 <style>
     .about-content {
         display: flex;
-        flex-wrap: wrap; /* Allow content to wrap on smaller screens */
-        gap: 30px; /* Space between text and image */
-        align-items: center; /* Vertically align content */
+        flex-wrap: wrap; 
+        gap: 30px;
+        align-items: center;
     }
 
     .about-text {
-        flex: 1 1 400px; /* Allow text to grow/shrink, with a base width */
-        background: #f8d5e6; /* Match hero section color */
-        border-radius: 16px; /* Rounded corners */
-        box-shadow: 0 4px 16px rgba(94, 84, 142, 0.08); /* Subtle purple shadow */
-        padding: 32px 28px; /* Comfortable padding */
-        margin: 12px 0; /* Space above and below */
+        flex: 1 1 400px;
+        background: #f8d5e6;
+        border-radius: 16px;
+        box-shadow: 0 4px 16px rgba(94, 84, 142, 0.08);
+        padding: 32px 28px;
+        margin: 12px 0;
     }
 
     .about-image {
-        flex: 1 1 300px; /* Allow image container to grow/shrink */
-        text-align: center; /* Center image if it's smaller than container */
+        flex: 1 1 300px; 
+        text-align: center;
     }
 
     .about-image img {
-        max-width: 100%; /* Image takes up max width of its container */
-        height: auto; /* Maintain aspect ratio */
-        border-radius: 8px; /* Optional: add rounded corners to images */
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Optional: add a subtle shadow */
+        max-width: 100%;
+        height: auto;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     }
 
-    /* Style for alternating image/text layout */
     .about-section:nth-of-type(even) .about-content {
-        flex-direction: row-reverse; /* Reverse the order for even sections */
+        flex-direction: row-reverse;
     }
 
      .about-section h2 {
-         color: #231942; /* Dark color for section titles */
+         color: #231942;
          text-align: center;
          margin-bottom: 20px;
      }
 
      .about-text h3 {
-         color: #5e548e; /* Medium purple for subheadings */
+         color: #5e548e;
          margin-bottom: 10px;
-         font-size: 1.2em; /* Make heading text bigger */
-         font-weight: bold; /* Make heading text bolder */
+         font-size: 1.2em;
+         font-weight: bold;
      }
 
      .about-text p {
-         color: #231942; /* Dark text color */
+         color: #231942;
          line-height: 1.6;
          margin-bottom: 15px;
-         font-size: 1.1em; /* Make paragraph text bigger */
-         font-weight: bold; /* Make paragraph text bolder */
+         font-size: 1.1em;
+         font-weight: bold;
      }
 
     .page-title {
@@ -123,11 +122,11 @@
 <?php include 'footer.php'; ?>
 
 <?php
-// Check for session alert message and display as JavaScript alert
+
 if (isset($_SESSION['alert'])) {
     $alert_type = $_SESSION['alert']['type'];
     $alert_message = $_SESSION['alert']['message'];
     echo "<script>alert('" . addslashes($alert_message) . "');</script>";
-    unset($_SESSION['alert']); // Clear the session variable
+    unset($_SESSION['alert']);
 }
-?> 
+?>

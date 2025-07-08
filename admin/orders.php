@@ -1,13 +1,9 @@
 <?php
 $page_title = 'Order Management';
 include 'includes/admin_header.php';
-// include 'includes/admin_sidebar.php'; // Sidebar will be included within admin-wrapper
 
-// Admin authentication check should be placed here or in admin_header.php
-// require_once '../includes/session.php';
-// requireAdminLogin();
 
-require_once '../config/database.php'; // Include database connection
+require_once '../config/database.php'; 
 
 $new_orders_count = 0;
 $shipped_orders_count = 0;
@@ -15,12 +11,10 @@ $completed_orders_count = 0;
 $orders = [];
 $error_message = null;
 
-// --- Data Fetching Logic ---
 
 try {
     $conn = getDBConnection();
 
-    // Fetch data for KPIs
     $stmt_new_orders = $conn->prepare("SELECT COUNT(*) FROM orders WHERE status = 'pending'");
     $stmt_new_orders->execute();
     $new_orders_count = $stmt_new_orders->fetchColumn();
@@ -33,7 +27,6 @@ try {
     $stmt_completed_orders->execute();
     $completed_orders_count = $stmt_completed_orders->fetchColumn() ?? 0;
 
-    // Fetch Orders with item count (joining with users and order_items)
     $stmt_orders = $conn->prepare("
         SELECT o.*, u.username, COUNT(oi.id) as num_items
         FROM orders o
@@ -131,7 +124,7 @@ try {
             </div>
         </div>
 
-        <!-- View Order Modal -->
+
         <div id="view-order-modal" class="modal" style="display:none;">
             <div class="modal-content">
                 <span class="close-button">&times;</span>
@@ -143,7 +136,7 @@ try {
             </div>
         </div>
 
-        <!-- Edit Order Modal -->
+
         <div id="edit-order-modal" class="modal" style="display:none;">
              <div class="modal-content">
                  <span class="close-button">&times;</span>
@@ -169,7 +162,6 @@ try {
 </div> <!-- Close admin-wrapper -->
 
 <?php
-// Add necessary scripts for modals and AJAX
 ?>
 
 <script>
@@ -186,21 +178,18 @@ document.addEventListener('DOMContentLoaded', function() {
     const editOrderForm = document.getElementById('edit-order-form');
     const editSaveButton = document.querySelector('.button.primary');
 
-    // Show View Order Modal and Load Data
     viewOrderButtons.forEach(button => {
         button.addEventListener('click', function() {
             const orderId = this.getAttribute('data-id');
             console.log('View order details for ID:', orderId);
 
-            // Show loading message
             orderDetailsContent.innerHTML = '<p style="text-align: center;">Loading order details for ID: ' + orderId + '...</p>';
             viewOrderModal.style.display = 'block';
 
-            // AJAX request to fetch order details
             fetch('get_order_details.php?id=' + orderId)
-                .then(response => response.text()) // Fetch as text to insert HTML
+                .then(response => response.text()) 
                 .then(html => {
-                    orderDetailsContent.innerHTML = html; // Insert the fetched HTML
+                    orderDetailsContent.innerHTML = html; 
                 })
                 .catch(error => {
                     console.error('AJAX Error fetching order details:', error);
@@ -209,28 +198,22 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
-    // Show Edit Order Modal and Populate Status
     editOrderButtons.forEach(button => {
         button.addEventListener('click', function() {
             const orderId = this.getAttribute('data-id');
             const currentStatus = this.getAttribute('data-status');
             console.log('Edit order status for ID:', orderId, 'Current status:', currentStatus);
 
-            // Set the order ID in the hidden input
             editOrderIdInput.value = orderId;
 
-            // Set the current status in the dropdown
             editOrderStatusSelect.value = currentStatus;
 
-            // Show the modal
             editOrderModal.style.display = 'block';
         });
     });
 
-     // Handle Delete Order
      deleteOrderButtons.forEach(button => {
          button.addEventListener('click', function(event) {
-             // Confirmation is handled by the onclick in the HTML
              const orderId = this.getAttribute('data-id');
              console.log('Delete order with ID:', orderId);
 
@@ -248,29 +231,23 @@ document.addEventListener('DOMContentLoaded', function() {
                  .then(response => response.json())
                  .then(data => {
                      if (data.success) {
-                         // alert('Order deleted successfully!'); // Removed alert
-                         window.location.reload(); // Reload page to update table
+                         window.location.reload(); 
                      } else {
-                         // alert('Error deleting order: ' + data.message);
-                          console.error('Error deleting order:', data.message || 'Unknown error'); // Log error to console
+                          console.error('Error deleting order:', data.message || 'Unknown error'); 
                      }
                  })
                  .catch(error => {
                      console.error('AJAX Error deleting order:', error);
-                     // alert('An error occurred while deleting the order.'); // Removed alert
                  });
              }
          });
      });
 
-    // Handle Edit Order Form Submission via AJAX
-    editOrderForm.addEventListener('submit', function(event) {
-        event.preventDefault(); // Prevent default form submission
 
-        // Disable button and show loading indicator if desired
+    editOrderForm.addEventListener('submit', function(event) {
+        event.preventDefault(); 
+
         editSaveButton.disabled = true;
-        // const originalButtonText = editSaveButton.textContent;
-        // editSaveButton.textContent = 'Saving...';
 
         const formData = new FormData(this);
 
@@ -282,49 +259,41 @@ document.addEventListener('DOMContentLoaded', function() {
             if (!response.ok) {
                  throw new Error('Network response was not ok');
             }
-            return response.json(); // Expecting a JSON response
+            return response.json(); 
         })
         .then(data => {
             if (data.success) {
-                // alert('Order updated successfully!'); // Removed alert
-                editOrderModal.style.display = 'none'; // Close the modal
-                window.location.reload(); // Reload page to show updated status
+                editOrderModal.style.display = 'none';
+                window.location.reload();
             } else {
-                // alert('Error updating order: ' + (data.message || 'Unknown error')); // Removed alert
-                console.error('Error updating order:', data.message || 'Unknown error'); // Keep logging to console
-                // Optionally display a message on the page
+                console.error('Error updating order:', data.message || 'Unknown error');
             }
         })
         .catch(error => {
             console.error('AJAX Error updating order:', error);
-            // alert('An error occurred while updating the order.'); // Removed alert
-            // Optionally display a message on the page
+
         })
          .finally(() => {
-             // Re-enable button and restore text if using loading indicator
-             // editSaveButton.disabled = false;
-             // editSaveButton.textContent = originalButtonText;
+            editSaveButton.disabled = false;
          });
     });
 
-    // Close Modals
     closeButtons.forEach(button => {
         button.addEventListener('click', function() {
-            // Determine which modal is open based on button parent
             const modal = button.closest('.modal');
             if (modal) {
                 modal.style.display = 'none';
-                // Optionally reset form/content here based on modal ID
+
                 if (modal.id === 'view-order-modal') {
                     orderDetailsContent.innerHTML = '<p style="text-align: center;">Loading order details...</p>'; // Reset view modal content
                 } else if (modal.id === 'edit-order-modal') {
-                    document.getElementById('edit-order-form').reset(); // Reset edit form
+                    document.getElementById('edit-order-form').reset(); 
                 }
             }
         });
     });
 
-    // Close modals if clicked outside
+
     window.addEventListener('click', function(event) {
         if (event.target == viewOrderModal) {
             viewOrderModal.style.display = 'none';

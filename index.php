@@ -6,38 +6,37 @@ require_once 'includes/session.php';
 
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
 <style>
-    /* Style for the feature item icons */
     .feature-item img {
-        max-width: 80px; /* Adjust size as needed */
+        max-width: 80px;
         height: auto;
         display: block;
-        margin: 0 auto 15px auto; /* Center image and add space below */
+        margin: 0 auto 15px auto;
     }
 
     .features {
         display: flex;
-        justify-content: space-around; /* Distribute space around items */
-        flex-wrap: wrap; /* Allow items to wrap on smaller screens */
-        gap: 20px; /* Add space between items */
+        justify-content: space-around;
+        flex-wrap: wrap;
+        gap: 20px;
     }
 
     .feature-item {
-        flex: 1 1 250px; /* Allow items to grow/shrink but maintain a base width */
+        flex: 1 1 250px;
         text-align: center;
         padding: 20px;
-        border: 1px solid #e0b1cb; /* Light pink border */
+        border: 1px solid #e0b1cb;
         border-radius: 8px;
-        background-color: #fff; /* White background */
+        background-color: #fff;
         box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
     }
 
      .feature-item h3 {
-         color: #5e548e; /* Medium purple for titles */
+         color: #5e548e;
          margin-bottom: 10px;
      }
 
      .feature-item p {
-         color: #231942; /* Dark text color */
+         color: #231942;
          font-size: 0.9em;
      }
 
@@ -108,7 +107,6 @@ require_once 'includes/session.php';
     <div class="container">
         <div class="featured-products-section" style="text-align: center; margin-bottom: 40px;">
             <h2 class="section-title">Featured Products</h2>
-            <!-- Placeholder for featured products -->
             <img src="images/offer-img.png" alt="Special Offer" style="max-width: 100%; height: auto; margin-top: 20px; display: block; margin-left: auto; margin-right: auto;">
         </div>
     </div>
@@ -156,4 +154,4 @@ if (isset($_SESSION['alert'])) {
     unset($_SESSION['alert']);
 }
 ?>
-</script> 
+</script>

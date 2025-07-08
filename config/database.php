@@ -1,8 +1,8 @@
 <?php
 // Database configuration
 define('DB_HOST', 'localhost'); // Or the host provided by your hosting
-define('DB_USER', 's22101184_craftsy');
-define('DB_PASS', 'Inakoy13');
+define('DB_USER', 'root');
+define('DB_PASS', '');
 define('DB_NAME', 's22101184_craftsy');
 // Create database connection
 function getDBConnection() {
@@ -19,9 +19,7 @@ function getDBConnection() {
         );
         return $conn;
     } catch(PDOException $e) {
-        // Log the error privately
         error_log("Database connection error: " . $e->getMessage());
-        // Display a generic error to the user
         die("Connection failed. Please try again later.");
     }
 }
@@ -53,4 +51,4 @@ function initializeDatabase() {
         error_log("Database initialization error: " . $e->getMessage());
         return false;
     }
-} 
+}

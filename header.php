@@ -9,52 +9,46 @@ require_once 'includes/session.php';
     <title><?php echo isset($page_title) ? $page_title . ' - Craftsy Nook' : 'Craftsy Nook'; ?></title>
     <link rel="stylesheet" href="css/style.css">
     <style>
-        /* Style for the profile dropdown container */
         .profile-dropdown {
             position: relative;
-            display: inline-block; /* Or block, depending on desired layout */
+            display: inline-block;
         }
 
-        /* Style for the dropdown content (hidden by default) */
         .profile-dropdown .dropdown-content {
             display: none;
             position: absolute;
-            background-color: #f9f9f9; /* Light background for the dropdown */
+            background-color: #f9f9f9; 
             min-width: 160px;
             box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
-            z-index: 1; /* Ensure it appears above other content */
-            right: 0; /* Align dropdown to the right of the icon */
-            top: 100%; /* Position below the icon */
+            z-index: 1;
+            right: 0;
+            top: 100%;
             border-radius: 5px;
-            overflow: hidden; /* Prevents rounded corners from being cut off */
+            overflow: hidden;
         }
 
-        /* Style for dropdown links */
         .profile-dropdown .dropdown-content a {
-            color: #231942; /* Dark text color */
+            color: #231942;
             padding: 12px 16px;
             text-decoration: none;
             display: block;
             text-align: left;
         }
 
-        /* Change color of dropdown links on hover */
         .profile-dropdown .dropdown-content a:hover {
-            background-color: #e0b1cb; /* Light pink hover effect */
+            background-color: #e0b1cb;
         }
 
-        /* Show the dropdown menu when the profile-dropdown container is hovered */
         .profile-dropdown:hover .dropdown-content {
             display: block;
         }
 
-        /* Set background image for the body */
         body {
             background-image: url('images/background.jpg');
-            background-size: cover; /* Cover the entire viewport */
+            background-size: cover;
             background-repeat: no-repeat;
-            background-attachment: fixed; /* Keep background fixed while scrolling */
-            background-position: center center; /* Center the background image */
+            background-attachment: fixed;
+            background-position: center center;
         }
     </style>
 </head>
@@ -113,4 +107,4 @@ require_once 'includes/session.php';
 //     echo "<script>alert('" . addslashes($alert_message) . "');</script>";
 //     unset($_SESSION['alert']); // Clear the session variable
 // }
-?> 
+?>

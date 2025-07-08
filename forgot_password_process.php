@@ -10,7 +10,6 @@ $step = $_POST['step'] ?? '1';
 try {
     $conn = getDBConnection();
     if ($step === '1') {
-        // Step 1: Check if email exists
         $stmt = $conn->prepare("SELECT id FROM users WHERE email = ?");
         $stmt->execute([$email]);
         $user = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -20,7 +19,6 @@ try {
             echo json_encode(['success' => false, 'message' => 'Email not found.']);
         }
     } elseif ($step === '2') {
-        // Step 2: Update password
         $user_id = intval($_POST['user_id'] ?? 0);
         if (!$user_id || !$new_password) {
             echo json_encode(['success' => false, 'message' => 'Missing user or password.']);

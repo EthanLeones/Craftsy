@@ -34,11 +34,10 @@
 <?php include 'footer.php'; ?>
 
 <?php
-// Check for session alert message and display as JavaScript alert
 if (isset($_SESSION['alert'])) {
     $alert_type = $_SESSION['alert']['type'];
     $alert_message = $_SESSION['alert']['message'];
     echo "<script>alert(\'" . addslashes($alert_message) . "\');</script>";
-    unset($_SESSION['alert']); // Clear the session variable
+    unset($_SESSION['alert']);
 }
 ?> 

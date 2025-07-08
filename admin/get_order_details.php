@@ -1,13 +1,7 @@
 <?php
 require_once '../config/database.php';
-require_once '../includes/session.php'; // Assuming session is used for admin login
+require_once '../includes/session.php'; 
 
-// Admin authentication check
-// requireAdminLogin(); // Implement this function
-// if (!isAdmin()) {
-//     echo '<p style="color: red;">Unauthorized access.</p>';
-//     exit();
-// }
 
 $order_id = $_GET['id'] ?? null;
 
@@ -24,13 +18,11 @@ $order_items = [];
 $error_message = null;
 
 try {
-    // Fetch order details, including user email
     $stmt_order = $conn->prepare("SELECT o.*, u.username, u.name as customer_name, u.email FROM orders o JOIN users u ON o.user_id = u.id WHERE o.id = ?");
     $stmt_order->execute([$order_id]);
     $order_details = $stmt_order->fetch(PDO::FETCH_ASSOC);
 
     if ($order_details) {
-        // Fetch order items
         $stmt_items = $conn->prepare("SELECT oi.*, p.name as product_name FROM order_items oi JOIN products p ON oi.product_id = p.id WHERE oi.order_id = ?");
         $stmt_items->execute([$order_id]);
         $order_items = $stmt_items->fetchAll(PDO::FETCH_ASSOC);

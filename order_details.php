@@ -11,13 +11,11 @@ if (isset($_GET['order_id'])) {
     $conn = getDBConnection();
 
     try {
-        // Fetch order details for the current user and specific order ID
         $stmt = $conn->prepare("SELECT * FROM orders WHERE id = ? AND user_id = ?");
         $stmt->execute([$order_id, $user_id]);
         $order = $stmt->fetch(PDO::FETCH_ASSOC);
 
         if ($order) {
-            // Fetch order items for this order
             $stmt_items = $conn->prepare("SELECT oi.*, p.name, p.image_url FROM order_items oi JOIN products p ON oi.product_id = p.id WHERE oi.order_id = ?");
             $stmt_items->execute([$order_id]);
             $order['items'] = $stmt_items->fetchAll(PDO::FETCH_ASSOC);
@@ -25,8 +23,7 @@ if (isset($_GET['order_id'])) {
 
     } catch (PDOException $e) {
         error_log("Error fetching specific order details: " . $e->getMessage());
-        // Handle error gracefully
-        $order = null; // Ensure $order is null on error
+        $order = null; 
     }
 }
 
@@ -37,23 +34,23 @@ include 'header.php';
 
 <style>
     .order-details-container {
-        background-color: rgba(255, 255, 255, 0.95); /* White background with slight transparency */
+        background-color: rgba(255, 255, 255, 0.95); 
         padding: 20px;
         border-radius: 8px;
         box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-        margin-top: 20px; /* Add some space below the title */
+        margin-top: 20px; 
     }
 
     .order-summary-section, .shipping-details-section, .order-items-section {
-        background-color: #fff; /* Ensure inner sections are fully white */
+        background-color: #fff; 
         padding: 15px;
         border-radius: 5px;
-        margin-bottom: 20px; /* Space between sections */
-        border: 1px solid #eee; /* Subtle border */
+        margin-bottom: 20px;
+        border: 1px solid #eee; 
     }
 
     .order-summary-section h3, .shipping-details-section h3, .order-items-section h3 {
-        color: #333; /* Darken headings for readability */
+        color: #333; 
         margin-top: 0;
         margin-bottom: 15px;
         padding-bottom: 10px;
@@ -61,11 +58,11 @@ include 'header.php';
     }
 
     .order-details-container p, .order-details-container table {
-         color: #555; /* Darken text for readability */
+         color: #555; 
     }
 
      .order-items-section table.table thead th {
-         background-color: #f8f8f8; /* Light background for table headers */
+         background-color: #f8f8f8;
      }
 
 </style>

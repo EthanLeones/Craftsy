@@ -1,6 +1,6 @@
 <?php
 require_once 'config/database.php';
-require_once 'includes/session.php'; // Include session management
+require_once 'includes/session.php'; 
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     $_SESSION['alert'] = ['type' => 'error', 'message' => 'Invalid request method.'];
@@ -10,14 +10,13 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 
 $email = $_POST['email'] ?? '';
 
-// Basic validation
+
 if (empty($email)) {
     $_SESSION['alert'] = ['type' => 'error', 'message' => 'Email address cannot be empty.'];
     header('Location: index.php');
     exit();
 }
 
-// Basic email format validation
 if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
      $_SESSION['alert'] = ['type' => 'error', 'message' => 'Invalid email format.'];
      header('Location: index.php');
@@ -27,7 +26,6 @@ if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
 $conn = getDBConnection();
 
 try {
-    // Check if email already exists
     $stmt = $conn->prepare("SELECT COUNT(*) FROM newsletter_subscribers WHERE email = ?");
     $stmt->execute([$email]);
     if ($stmt->fetchColumn() > 0) {
@@ -36,7 +34,6 @@ try {
         exit();
     }
 
-    // Insert new subscriber
     $stmt = $conn->prepare("INSERT INTO newsletter_subscribers (email) VALUES (?)");
     $stmt->execute([$email]);
 

@@ -7,7 +7,7 @@ include 'header.php';
 $user_id = isLoggedIn() ? getCurrentUserId() : null;
 $conn = getDBConnection();
 
-// Fetch or create the user's thread
+
 $thread = null;
 if ($user_id) {
     $stmt = $conn->prepare("SELECT * FROM inquiry_threads WHERE user_id = ? ORDER BY created_at DESC LIMIT 1");
@@ -24,7 +24,7 @@ if ($user_id) {
     }
 }
 
-// Fetch messages for the thread
+
 $messages = [];
 if ($thread) {
     $stmt = $conn->prepare("SELECT m.*, u.name as sender_name, u.role as sender_role FROM inquiry_messages m JOIN users u ON m.sender_id = u.id WHERE m.thread_id = ? ORDER BY m.created_at ASC");
@@ -59,7 +59,7 @@ if ($thread) {
     <?php endif; ?>
 </div>
 
-</div> <!-- Close container from header.php -->
+</div> 
 
 <?php include 'footer.php'; ?>
 
@@ -90,7 +90,6 @@ document.getElementById('chat-form')?.addEventListener('submit', function(e) {
     .then(res => res.json())
     .then(data => {
         if (data.success) {
-            // Reload chat on success
             window.location.reload();
         } else {
             alert(data.message || 'Failed to send message.');
@@ -101,10 +100,7 @@ document.getElementById('chat-form')?.addEventListener('submit', function(e) {
 </script>
 
 <?php
-// Dummy function to get user email - replace with actual DB call if needed
 function getUserEmail($user_id) {
-    // In a real application, you would fetch the email from the users table
-    // using the user_id. For now, return a placeholder or empty string.
-    return ''; // Placeholder
+    return ''; 
 }
 ?> 

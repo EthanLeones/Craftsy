@@ -15,17 +15,15 @@ if ($product_id) {
         $product = $stmt->fetch(PDO::FETCH_ASSOC);
     } catch (PDOException $e) {
         error_log("Error fetching product details: " . $e->getMessage());
-        // Handle error gracefully
         $_SESSION['alert'] = ['type' => 'danger', 'message' => 'An error occurred while loading product details.'];
-         header('Location: shop.php'); // Redirect back to shop
+         header('Location: shop.php');
          exit();
     }
 }
 
-// If product not found or out of stock
 if (!$product) {
     $_SESSION['alert'] = ['type' => 'warning', 'message' => 'Product not found or out of stock.'];
-    header('Location: shop.php'); // Redirect back to shop
+    header('Location: shop.php');
     exit();
 }
 
@@ -40,7 +38,7 @@ if (!$product) {
     }
 
     .product-image-area {
-        flex: 1 1 400px; /* Grow/shrink, base width 400px */
+        flex: 1 1 400px;
         text-align: center;
     }
 
@@ -52,31 +50,31 @@ if (!$product) {
     }
 
     .product-details-area {
-        flex: 1 1 400px; /* Grow/shrink, base width 400px */
+        flex: 1 1 400px;
     }
 
     .product-details-area h1 {
-        color: #231942; /* Dark title color */
+        color: #231942;
         margin-top: 0;
         margin-bottom: 10px;
         font-size: 2em;
     }
 
     .product-details-area .price {
-        color: #5e548e; /* Medium purple for price */
+        color: #5e548e;
         font-size: 1.5em;
         margin-bottom: 15px;
         display: block;
     }
 
      .product-details-area .description {
-         color: #231942; /* Dark text color */
+         color: #231942;
          margin-bottom: 20px;
          line-height: 1.6;
      }
 
      .product-details-area .meta-info {
-         background-color: #f8f4fa; /* Very light purple */
+         background-color: #f8f4fa;
          padding: 15px;
          border-radius: 8px;
          margin-bottom: 20px;
@@ -89,7 +87,7 @@ if (!$product) {
 
      .product-details-area label {
          font-weight: bold;
-         color: #5e548e; /* Medium purple */
+         color: #5e548e;
          margin-right: 10px;
      }
 
@@ -102,7 +100,7 @@ if (!$product) {
     .add-to-cart-form input[type="number"],
     .add-to-cart-form select {
         padding: 8px;
-        border: 1px solid #be95c4; /* Medium pink border */
+        border: 1px solid #be95c4;
         border-radius: 4px;
         margin-bottom: 15px;
     }
@@ -110,7 +108,7 @@ if (!$product) {
     .add-to-cart-form button {
         display: inline-block;
         padding: 10px 20px;
-        background-color: #9f86c0; /* Medium purple button */
+        background-color: #9f86c0;
         color: white;
         border: none;
         border-radius: 5px;
@@ -119,22 +117,22 @@ if (!$product) {
     }
 
     .add-to-cart-form button:hover {
-        background-color: #5e548e; /* Darker purple on hover */
+        background-color: #5e548e;
     }
 
      .continue-shopping-button {
          display: inline-block;
          margin-top: 20px;
          padding: 10px 20px;
-         background-color: #e0b1cb; /* Light pink button */
-         color: #231942; /* Dark text color */
+         background-color: #e0b1cb;
+         color: #231942;
          text-decoration: none;
          border-radius: 5px;
          transition: background-color 0.3s ease;
      }
 
      .continue-shopping-button:hover {
-         background-color: #be95c4; /* Medium pink on hover */
+         background-color: #be95c4;
      }
 
 
@@ -172,13 +170,21 @@ if (!$product) {
             </div>
         </div>
 
-</div> <!-- Close container from header.php -->
+</div>
 
 <?php include 'footer.php'; ?>
 
 <?php
 // Check for session alert message and display as JavaScript alert
-// ... existing code ...
+if (isset($_SESSION['alert'])) {
+    $alert = $_SESSION['alert'];
+    echo "<script>
+            document.addEventListener('DOMContentLoaded', function() {
+                alert('".addslashes($alert['message'])."');
+            });
+          </script>";
+    unset($_SESSION['alert']);
+}
 ?>
 
 <script>
@@ -197,22 +203,18 @@ document.addEventListener('DOMContentLoaded', function() {
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
-                    // Update cart count in header if needed
                     const cartCountSpan = document.querySelector('.header-icons .cart-count');
                     if (cartCountSpan && data.cart_count !== undefined) {
                          cartCountSpan.textContent = data.cart_count;
                     }
-                    // Optionally provide visual feedback to the user (e.g., a temporary "Added to Cart" message)
                 } else {
-                    console.error('Failed to add to cart:', data.message); // Keep logging to console
-                     // Optionally display an error message on the page
+                    console.error('Failed to add to cart:', data.message);
                 }
             })
             .catch(error => {
                 console.error('Error:', error);
-                // Optionally display an error message on the page
             });
         });
     }
 });
-</script> 
+</script>

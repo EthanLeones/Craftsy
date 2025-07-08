@@ -1,13 +1,7 @@
 <?php
 require_once '../config/database.php';
-require_once '../includes/session.php'; // Assuming session is used for admin login
+require_once '../includes/session.php'; 
 
-// Admin authentication check
-// requireAdminLogin(); // Implement this function
-// if (!isAdmin()) {
-//     echo '<p style="color: red;">Unauthorized access.</p>';
-//     exit();
-// }
 
 $inquiry_id = $_GET['id'] ?? null;
 
@@ -24,18 +18,15 @@ $inquiry_responses = [];
 $error_message = null;
 
 try {
-    // Fetch inquiry details
     $stmt_inquiry = $conn->prepare("SELECT i.*, u.username, u.name as customer_name FROM inquiries i LEFT JOIN users u ON i.user_id = u.id WHERE i.id = ?");
     $stmt_inquiry->execute([$inquiry_id]);
     $inquiry_details = $stmt_inquiry->fetch(PDO::FETCH_ASSOC);
 
     if ($inquiry_details) {
-        // Fetch inquiry responses for this inquiry
         $stmt_responses = $conn->prepare("SELECT * FROM inquiry_responses WHERE inquiry_id = ? ORDER BY created_at ASC");
         $stmt_responses->execute([$inquiry_id]);
         $inquiry_responses = $stmt_responses->fetchAll(PDO::FETCH_ASSOC);
 
-         // Mark inquiry as read if it was 'new'
          if ($inquiry_details['status'] === 'new') {
               $stmt_mark_read = $conn->prepare("UPDATE inquiries SET status = 'read' WHERE id = ?");
               $stmt_mark_read->execute([$inquiry_id]);

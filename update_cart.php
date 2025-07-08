@@ -2,7 +2,7 @@
 require_once 'includes/session.php';
 require_once 'config/database.php';
 
-header('Content-Type: application/json'); // Indicate JSON response
+header('Content-Type: application/json'); 
 
 $response = ['success' => false, 'message' => 'An error occurred.'];
 
@@ -27,11 +27,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $conn = getDBConnection();
 
         if ($quantity > 0) {
-            // Update quantity
             $stmt = $conn->prepare("UPDATE cart SET quantity = ? WHERE user_id = ? AND product_id = ?");
             $stmt->execute([$quantity, $user_id, $product_id]);
         } else {
-            // Quantity is 0, remove item
             $stmt = $conn->prepare("DELETE FROM cart WHERE user_id = ? AND product_id = ?");
             $stmt->execute([$user_id, $product_id]);
         }
