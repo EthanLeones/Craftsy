@@ -15,7 +15,7 @@ $categories = [
     ['name' => 'Accessories', 'link' => 'shop.php?category=Accessories'],
 ];
 
-$sql = "SELECT * FROM products WHERE stock_quantity > 0";
+$sql = "SELECT * FROM products WHERE stock_quantity > 0 AND active = 1";
 $params = [];
 
 if (isset($_GET['category']) && !empty($_GET['category'])) {
