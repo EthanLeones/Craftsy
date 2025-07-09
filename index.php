@@ -153,5 +153,5 @@ if (isset($_SESSION['alert'])) {
     echo "showToast('" . addslashes($alert_message) . "', '" . ($alert_type === 'success' ? 'success' : 'error') . "');";
     unset($_SESSION['alert']);
 }
-?>
+?> //inakoy
 </script>
