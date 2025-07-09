@@ -9,14 +9,14 @@ $response = ['success' => false, 'message' => 'An error occurred.'];
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $order_id = $_POST['order_id'] ?? null;
     $status = $_POST['status'] ?? null;
-
+    $status = strtolower(trim($status));
     if (!$order_id || !$status) {
         $response['message'] = 'Missing order ID or status.';
         echo json_encode($response);
         exit();
     }
 
-    $allowed_statuses = ['pending', 'processing', 'shipped', 'delivered', 'cancelled', 'failed'];
+    $allowed_statuses = ['pending', 'processing', 'shipping', 'delivered', 'cancelled', 'failed'];
     if (!in_array($status, $allowed_statuses)) {
         $response['message'] = 'Invalid status value.';
         echo json_encode($response);
@@ -32,6 +32,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if ($stmt->rowCount() > 0) {
             $response['success'] = true;
             $response['message'] = 'Order status updated successfully.';
+            
         } else {
             $response['message'] = 'Order not found or status was already the same.';
         }

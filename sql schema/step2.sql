@@ -61,7 +61,7 @@ CREATE TABLE `orders` (
   `id` int(11) NOT NULL,
   `user_id` int(11) DEFAULT NULL,
   `total_amount` decimal(10,2) NOT NULL,
-  `status` enum('pending','processing','shipped','completed','failed') DEFAULT 'pending',
+  `status` enum('pending','processing','shipping','delivered','cancelled') DEFAULT 'pending',
   `shipping_address_line1` varchar(255) DEFAULT NULL,
   `shipping_address_line2` varchar(255) DEFAULT NULL,
   `shipping_city` varchar(100) DEFAULT NULL,

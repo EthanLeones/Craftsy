@@ -148,7 +148,7 @@ try {
                          <select id="edit_order_status" name="status" required>
                              <option value="pending">Pending</option>
                              <option value="processing">Processing</option>
-                             <option value="shipped">Shipped</option>
+                             <option value="shipped">Shipping</option>
                              <option value="delivered">Delivered</option>
                              <option value="cancelled">Cancelled</option>
                          </select>
