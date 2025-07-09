@@ -131,7 +131,7 @@ INSERT INTO `products` (`id`, `name`, `description`, `price`, `active`, `categor
 (15, 'Black Luxe Sling', 'Height 10 inches\r\nLength top 16 inches\r\nWidth 6 inches', 800.00, 1, 'Sling', 9, 'images/products/e9dc79ae96afbbc64df5dfc9c600978a.png', '2025-05-27 00:39:47', '2025-07-09 10:53:17'),
 (16, 'Brown/Black Luxe Sling', 'Height 10 inches\r\nLength top 16 inches\r\nWidth 6 inches', 800.00, 1, 'Sling', 1, 'images/products/a328e6e64d4b344ec30b43e4d1973f44.png', '2025-05-27 00:40:42', '2025-07-09 10:53:17'),
 (17, 'Pink Floral Ribbon', 'Aesthetic pink ribbon', 50.00, 1, 'Accessories', 14, 'images/products/f92a7327df8bece188ec7b9a60d665f6.png', '2025-05-27 00:41:23', '2025-07-09 11:33:06'),
-(18, 'Red Horse', 'Handcrafted red horse keychain', 100.00, 0, 'Accessories', 1, 'images/products/65fc1f46bda68341e8272e6d7b84f361.png', '2025-05-27 00:41:56', '2025-07-09 11:38:48');
+(18, 'Red Horse', 'Handcrafted red horse keychain', 100.00, 1, 'Accessories', 1, 'images/products/65fc1f46bda68341e8272e6d7b84f361.png', '2025-05-27 00:41:56', '2025-07-09 11:38:48');
 
 -- --------------------------------------------------------
 
