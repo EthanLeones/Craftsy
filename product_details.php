@@ -188,35 +188,7 @@ if (isset($_SESSION['alert'])) {
 ?>
 
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    const addToCartForm = document.querySelector('.add-to-cart-form');
-    if (addToCartForm) {
-        addToCartForm.addEventListener('submit', function(event) {
-            event.preventDefault();
 
-            const formData = new FormData(this);
-
-            fetch('add_to_cart.php', {
-                method: 'POST',
-                body: formData
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    const cartCountSpan = document.querySelector('.header-icons .cart-count');
-                    if (cartCountSpan && data.cart_count !== undefined) {
-                         cartCountSpan.textContent = data.cart_count;
-                    }
-                } else {
-                    console.error('Failed to add to cart:', data.message);
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-            });
-        });
-    }
-});
 
 document.addEventListener('DOMContentLoaded', function() {
     const addToCartForm = document.querySelector('.add-to-cart-form');

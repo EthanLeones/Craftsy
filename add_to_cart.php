@@ -26,15 +26,37 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     try {
         $conn = getDBConnection();
 
-       
-        $stmt = $conn->prepare("SELECT * FROM cart WHERE user_id = ? AND product_id = ?");
+
+        $stmt = $conn->prepare("SELECT stock_quantity FROM products WHERE id = ? AND active = 1");
+        $stmt->execute([$product_id]);
+        $product = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if (!$product) {
+            $response['message'] = 'Product not found or inactive.';
+            echo json_encode($response);
+            exit();
+        }
+
+        $available_stock = (int)$product['stock_quantity'];
+
+
+        $stmt = $conn->prepare("SELECT quantity FROM cart WHERE user_id = ? AND product_id = ?");
         $stmt->execute([$user_id, $product_id]);
-        $cart_item = $stmt->fetch();
+        $cart_item = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        $existing_quantity = $cart_item ? (int)$cart_item['quantity'] : 0;
+        $total_requested = $existing_quantity + $quantity;
+
+        if ($total_requested > $available_stock) {
+            $response['message'] = "You can't add more than the available stock. You already have $existing_quantity in your cart.";
+            echo json_encode($response);
+            exit();
+        }
+
 
         if ($cart_item) {
-            $new_quantity = $cart_item['quantity'] + $quantity;
             $stmt = $conn->prepare("UPDATE cart SET quantity = ? WHERE user_id = ? AND product_id = ?");
-            $stmt->execute([$new_quantity, $user_id, $product_id]);
+            $stmt->execute([$total_requested, $user_id, $product_id]);
         } else {
             $stmt = $conn->prepare("INSERT INTO cart (user_id, product_id, quantity) VALUES (?, ?, ?)");
             $stmt->execute([$user_id, $product_id, $quantity]);
@@ -50,4 +72,4 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
-echo json_encode($response); 
+echo json_encode($response);
