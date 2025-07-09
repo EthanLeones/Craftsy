@@ -217,4 +217,59 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 });
+
+document.addEventListener('DOMContentLoaded', function() {
+    const addToCartForm = document.querySelector('.add-to-cart-form');
+    if (addToCartForm) {
+        addToCartForm.addEventListener('submit', function(event) {
+            event.preventDefault();
+
+            const formData = new FormData(this);
+
+            fetch('add_to_cart.php', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    const cartCountSpan = document.querySelector('.header-icons .cart-count');
+                    if (cartCountSpan && data.cart_count !== undefined) {
+                        cartCountSpan.textContent = data.cart_count;
+                    }
+                    showPopup(data.message); // ✅ Show success popup
+                } else {
+                    showPopup(data.message); // ❌ Show error popup
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showPopup('Something went wrong. Please try again.');
+            });
+        });
+    }
+
+    function showPopup(message) {
+        const popup = document.createElement('div');
+        popup.innerText = message;
+        popup.style.position = 'fixed';
+        popup.style.bottom = '20px';
+        popup.style.right = '20px';
+        popup.style.backgroundColor = '#28a745';
+        popup.style.color = 'white';
+        popup.style.padding = '12px 20px';
+        popup.style.borderRadius = '8px';
+        popup.style.boxShadow = '0 4px 8px rgba(0,0,0,0.2)';
+        popup.style.zIndex = '1000';
+        popup.style.fontFamily = 'Arial, sans-serif';
+        popup.style.transition = 'opacity 0.3s ease';
+        document.body.appendChild(popup);
+
+        setTimeout(() => {
+            popup.style.opacity = '0';
+            setTimeout(() => popup.remove(), 300);
+        }, 3000);
+    }
+});
+
 </script>
