@@ -10,14 +10,51 @@ $error_message = null;
 
 try {
     $conn = getDBConnection();
+
+    // Get current page from query string
+    $page = isset($_GET['page']) && is_numeric($_GET['page']) ? (int) $_GET['page'] : 1;
+    $limit = 10;
+    $offset = ($page - 1) * $limit;
+
+    $sort = $_GET['sort'] ?? '';
+    $whereClause = 'active = 1';
+    $orderBy = 'created_at DESC';
+
+    switch ($sort) {
+        case 'in_stock_true':
+            $orderBy = 'stock_quantity DESC';
+            break;
+        case 'in_stock_false':
+            $orderBy = 'stock_quantity ASC';
+            break;
+        case 'is_active':
+            // Show inactive products only
+            $whereClause = 'active = 0';
+            $orderBy = 'id ASC';
+            break;
+    }
+
+
+
+
+    // Get total number of products
+    $stmt_total = $conn->query("SELECT COUNT(*) FROM products WHERE $whereClause");
+    $totalResults = $stmt_total->fetchColumn();
+    $totalPages = ceil($totalResults / $limit);
+
+    // Fetch paginated products
     $stmt_products = $conn->prepare("
-        SELECT p.* 
-        FROM products p 
-        ORDER BY p.created_at DESC
+        SELECT * FROM products 
+        WHERE $whereClause
+        ORDER BY $orderBy 
+        LIMIT :limit OFFSET :offset
     ");
+    $stmt_products->bindValue(':limit', $limit, PDO::PARAM_INT);
+    $stmt_products->bindValue(':offset', $offset, PDO::PARAM_INT);
     $stmt_products->execute();
     $products = $stmt_products->fetchAll(PDO::FETCH_ASSOC);
 
+    // Static categories
     $categories = [
         ['id' => 1, 'name' => 'Classic'],
         ['id' => 2, 'name' => 'Pouch'],
@@ -32,7 +69,6 @@ try {
     error_log("Error fetching products or categories: " . $e->getMessage());
     $error_message = "Unable to load data.";
 }
-
 ?>
 
 <div class="admin-wrapper">
@@ -47,6 +83,16 @@ try {
                  <button class="button primary" id="add-product-button">Add New Product</button>
              </div>
             <div class="admin-table-container">
+                <div class="flex justify-start items-center mb-3">
+    <label for="sort" class="mr-2 font-medium text-yellow-900">Sort by:</label>
+    <select id="sort" name="sort" class="px-3 py-1 border border-yellow-900 rounded-md bg-white focus:outline-none focus:ring-2 focus:ring-yellow-200">
+        <option value="">-- Select --</option>
+        <option value="in_stock_true" <?= ($sort === 'in_stock_true') ? 'selected' : '' ?>>In Stock (High to Low)</option>
+        <option value="in_stock_false" <?= ($sort === 'in_stock_false') ? 'selected' : '' ?>>In Stock (Low to High)</option>
+        <option value="is_active" <?= ($sort === 'is_active') ? 'selected' : '' ?>>Inactive Products</option>
+    </select>
+</div>
+
                 <table class="admin-table">
                     <thead>
                         <tr>
@@ -82,13 +128,29 @@ try {
                                     <td><?php echo htmlspecialchars($product['updated_at'] ?? $product['created_at']); ?></td>
                                     <td>
                                         <button class="button small edit-product-button" data-id="<?php echo htmlspecialchars($product['id']); ?>">Edit</button>
-                                        <button class="button small danger delete-product-button" data-id="<?php echo htmlspecialchars($product['id']); ?>">Delete</button>
+                                        <?php if ($sort === 'is_active'): ?>
+                                            <button class="button small success reactivate-product-button" data-id="<?php echo htmlspecialchars($product['id']); ?>">Reactivate</button>
+                                            <?php else: ?>
+                                            <button class="button small danger delete-product-button" data-id="<?php echo htmlspecialchars($product['id']); ?>">Deactivate</button>
+                                        
+
+                                        <?php endif; ?>
+
                                     </td>
                                 </tr>
                             <?php endforeach; ?>
                         <?php endif; ?>
                     </tbody>
                 </table>
+                <?php if ($totalPages > 1): ?>
+                    <div class="pagination-container">
+                        <?php for ($i = 1; $i <= $totalPages; $i++): ?>
+                            <a href="?page=<?= $i ?>&sort=<?= urlencode($sort) ?>"  class="pagination-link <?= ($page == $i) ? 'active' : '' ?>">
+                                <?= $i ?>
+                            </a>
+                        <?php endfor; ?>
+                    </div>
+                <?php endif; ?>
             </div>
         </div>
 
@@ -229,21 +291,22 @@ document.addEventListener('DOMContentLoaded', function() {
             .then(data => {
                 if (data.success) {
                     // Show success message
-                    alert('Product added successfully!');
+                    showPopup('Product added successfully!');
                     // Close modal
-                    addProductModal.style.display = 'none';
+                    showPopup(data.message || 'Error adding product. Please try again.', '#dc3545');
+
                     // Reset form
                     addProductForm.reset();
                     // Reload page to show new product
                     window.location.reload();
                 } else {
                     // Show error message
-                    alert(data.message || 'Error adding product. Please try again.');
+                    showPopup('An error occurred while adding the product. Please try again.', '#dc3545');
                 }
             })
             .catch(error => {
                 console.error('Error:', error);
-                alert('An error occurred while adding the product. Please try again.');
+                showPopup('An error occurred while adding the product. Please try again.', '#dc3545');
             })
             .finally(() => {
                 // Reset button state
@@ -285,12 +348,13 @@ document.addEventListener('DOMContentLoaded', function() {
                         // Show the modal
                         editProductModal.style.display = 'block';
                     } else {
-                        alert('Error loading product details.');
+                        showPopup('Error loading product details.', '#dc3545');
+
                     }
                 })
                 .catch(error => {
                     console.error('Error:', error);
-                    alert('Error loading product details.');
+                    showPopup('An error occurred while loading product details.', '#dc3545');
                 });
         });
     });
@@ -306,13 +370,13 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // Handle Delete Product
+    // Handle Deactivation Product
     deleteProductButtons.forEach(button => {
         button.addEventListener('click', function() {
             const productId = this.getAttribute('data-id');
             console.log('Attempting to delete product with ID:', productId);
 
-            if (confirm('Are you sure you want to delete this product?')) {
+            if (confirm('Are you sure you want to deactivate this product?')) {
                 fetch('process_delete_product.php', {
                     method: 'POST',
                     headers: {
@@ -328,17 +392,47 @@ document.addEventListener('DOMContentLoaded', function() {
                         window.location.reload(); // Reload page to update the list
                     } else {
                         // Optionally show an error message
-                        // alert('Error deleting product: ' + (data.message || 'Unknown error')); // Removed alert
+                        showPopup('Error deleting product: ' + (data.message || 'Unknown error'), '#dc3545');
                          console.error('Error deleting product:', data.message || 'Unknown error'); // Log error to console
                     }
                 })
                 .catch(error => {
                     console.error('AJAX Error deleting product:', error);
+                    showPopup('An error occurred while deleting the product.', '#dc3545');
                     // alert('An error occurred while deleting the product.'); // Removed alert
                 });
             }
         });
     });
+
+    // Handle Reactivate Product
+    document.querySelectorAll('.reactivate-product-button').forEach(button => {
+        button.addEventListener('click', function () {
+            const productId = this.getAttribute('data-id');
+
+            fetch('process_toggle_product_status.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: 'product_id=' + productId + '&active=1'
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showPopup('Product reactivated successfully!');
+                    window.location.reload();
+                } else {
+                    showPopup('Error reactivating product: ' + (data.message || 'Unknown error'), '#dc3545');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showPopup('An error occurred while reactivating the product.', '#dc3545');
+            });
+        });
+    });
+
 
     // Close Modals
     closeButtons.forEach(button => {
@@ -360,5 +454,75 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
+    function showPopup(message, color = '#28a745') {
+    const popup = document.createElement('div');
+    popup.innerText = message;
+    popup.style.position = 'fixed';
+    popup.style.top = '50%';
+    popup.style.left = '50%';
+    popup.style.transform = 'translate(-50%, -50%)';
+    popup.style.backgroundColor = color;
+    popup.style.color = 'white';
+    popup.style.padding = '16px 24px';
+    popup.style.borderRadius = '10px';
+    popup.style.boxShadow = '0 8px 20px rgba(0,0,0,0.3)';
+    popup.style.zIndex = '1000';
+    popup.style.fontFamily = 'Arial, sans-serif';
+    popup.style.fontSize = '1.1em';
+    popup.style.textAlign = 'center';
+    popup.style.maxWidth = '80%';
+    popup.style.opacity = '1';
+    popup.style.transition = 'opacity 0.3s ease';
+
+    document.body.appendChild(popup);
+
+    setTimeout(() => {
+        popup.style.opacity = '0';
+        setTimeout(() => popup.remove(), 300);
+    }, 3000);
+    }
+
+    document.getElementById('sort').addEventListener('change', function () {
+        const selected = this.value;
+        const url = new URL(window.location.href);
+        url.searchParams.set('sort', selected);
+        url.searchParams.set('page', 1); // Reset to first page on sort
+        window.location.href = url.toString();
+    });
+
 });
 </script>
+
+<style>
+    .pagination-container {
+    text-align: center;
+    margin-top: 20px;
+    animation: fadeIn 0.5s ease-in-out;
+}
+
+.pagination-link {
+    display: inline-block;
+    padding: 6px 12px;
+    margin: 2px;
+    border-radius: 6px;
+    background-color: #e5e7eb; /* gray-200 */
+    color: #333;
+    text-decoration: none;
+    transition: background-color 0.3s ease;
+}
+
+.pagination-link:hover {
+    background-color: #d1d5db; /* gray-300 */
+}
+
+.pagination-link.active {
+    background-color: #9f86c0; /* purple-300 */
+    color: white;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+</style>

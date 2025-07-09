@@ -17,33 +17,28 @@ try {
     $conn = getDBConnection();
     $conn->beginTransaction();
 
-    $stmt_get_image = $conn->prepare("SELECT image_url FROM products WHERE id = ?");
-    $stmt_get_image->execute([$product_id]);
-    $product = $stmt_get_image->fetch(PDO::FETCH_ASSOC);
-    $image_url = $product['image_url'] ?? null;
+    // Optional: Check if product exists
+    $stmt_check = $conn->prepare("SELECT id FROM products WHERE id = ?");
+    $stmt_check->execute([$product_id]);
+    if (!$stmt_check->fetch()) {
+        echo json_encode(['success' => false, 'message' => 'Product not found.']);
+        exit();
+    }
 
-    $stmt_delete_product = $conn->prepare("DELETE FROM products WHERE id = ?");
-    $stmt_delete_product->execute([$product_id]);
+    // Soft delete: set active = 0
+    $stmt_soft_delete = $conn->prepare("UPDATE products SET active = 0 WHERE id = ?");
+    $stmt_soft_delete->execute([$product_id]);
 
-    if ($stmt_delete_product->rowCount() > 0) {
-        if ($image_url && $image_url !== 'images/placeholder_admin.png') {
-            $image_path = __DIR__ . '/../' . $image_url;
-            if (file_exists($image_path)) {
-                unlink($image_path);
-            }
-        }
+    if ($stmt_soft_delete->rowCount() > 0) {
         $conn->commit();
-        echo json_encode(['success' => true, 'message' => 'Product deleted successfully.']);
+        echo json_encode(['success' => true, 'message' => 'Product marked as inactive.']);
     } else {
         $conn->rollBack();
-        echo json_encode(['success' => false, 'message' => 'Product not found or could not be deleted.']);
+        echo json_encode(['success' => false, 'message' => 'No changes made.']);
     }
 
 } catch (PDOException $e) {
     $conn->rollBack();
-    error_log("Error deleting product: " . $e->getMessage());
+    error_log("Error updating product status: " . $e->getMessage());
     echo json_encode(['success' => false, 'message' => 'Database error: ' . $e->getMessage()]);
-} catch (Exception $e) {
-     error_log("Error deleting product file: " . $e->getMessage());
-     echo json_encode(['success' => false, 'message' => 'An error occurred during file deletion.']);
 }

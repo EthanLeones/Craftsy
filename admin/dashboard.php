@@ -34,7 +34,7 @@ try {
     $stmt_pending_orders->execute([$today_start, $today_end]);
     $pending_orders = $stmt_pending_orders->fetchAll(PDO::FETCH_ASSOC);
 
-    $stmt_low_stock_products = $conn->prepare("SELECT id, name, stock_quantity, image_url FROM products WHERE stock_quantity <= ? AND stock_quantity > 0 ORDER BY stock_quantity ASC LIMIT 5");
+    $stmt_low_stock_products = $conn->prepare("SELECT id, name, stock_quantity, image_url FROM products WHERE stock_quantity <= ? AND stock_quantity > 0 AND active = 1 ORDER BY stock_quantity ASC");
     $stmt_low_stock_products->execute([$low_stock_threshold]);
     $low_stock_products = $stmt_low_stock_products->fetchAll(PDO::FETCH_ASSOC);
 

@@ -34,8 +34,7 @@ try {
     $stmt_top_selling->execute([$thirty_days_ago]);
     $top_selling_products = $stmt_top_selling->fetchAll(PDO::FETCH_ASSOC);
 
-
-    $stmt_low_stock_products = $conn->prepare("SELECT id, name, stock_quantity, price, image_url FROM products WHERE stock_quantity <= ? AND stock_quantity > 0 ORDER BY stock_quantity ASC");
+    $stmt_low_stock_products = $conn->prepare("SELECT id, name, stock_quantity, price, image_url FROM products WHERE stock_quantity <= ? AND stock_quantity > 0  AND active = 1 ORDER BY stock_quantity ASC");
     $stmt_low_stock_products->execute([$low_stock_threshold]);
     $low_stock_products = $stmt_low_stock_products->fetchAll(PDO::FETCH_ASSOC);
 
