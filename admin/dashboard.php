@@ -16,33 +16,87 @@ $low_stock_threshold = 10;
 try {
     $conn = getDBConnection();
 
+    // Today's date range
     $today_start = date('Y-m-d 00:00:00');
     $today_end = date('Y-m-d 23:59:59');
-    $stmt_today_sales = $conn->prepare("SELECT SUM(total_amount) FROM orders WHERE order_date BETWEEN ? AND ? AND status != 'cancelled'");
+
+    // Today's sales
+    $stmt_today_sales = $conn->prepare("
+        SELECT SUM(total_amount) 
+        FROM orders 
+        WHERE order_date BETWEEN ? AND ? 
+        AND status != 'cancelled'
+    ");
     $stmt_today_sales->execute([$today_start, $today_end]);
     $today_sales = $stmt_today_sales->fetchColumn() ?? 0;
 
-    $stmt_new_orders = $conn->prepare("SELECT COUNT(*) FROM orders WHERE status = 'pending' AND order_date BETWEEN ? AND ?");
+    // New orders today
+    $stmt_new_orders = $conn->prepare("
+        SELECT COUNT(*) 
+        FROM orders 
+        WHERE status = 'pending' 
+        AND order_date BETWEEN ? AND ?
+    ");
     $stmt_new_orders->execute([$today_start, $today_end]);
     $new_orders_count = $stmt_new_orders->fetchColumn() ?? 0;
 
+    // Total inquiries
     $stmt_inquiries_count = $conn->prepare("SELECT COUNT(*) FROM inquiry_threads");
     $stmt_inquiries_count->execute();
     $inquiries_count = $stmt_inquiries_count->fetchColumn() ?? 0;
 
-    $stmt_pending_orders = $conn->prepare("SELECT o.id, o.order_date, o.total_amount, o.status, u.username, COUNT(oi.id) as num_items FROM orders o JOIN users u ON o.user_id = u.id JOIN order_items oi ON o.id = oi.order_id WHERE o.status = 'pending' AND o.order_date BETWEEN ? AND ? GROUP BY o.id ORDER BY o.order_date DESC LIMIT 10");
+    // Pending orders today
+    $stmt_pending_orders = $conn->prepare("
+        SELECT o.id, o.order_date, o.total_amount, o.status, u.username, COUNT(oi.id) AS num_items 
+        FROM orders o 
+        JOIN users u ON o.user_id = u.id 
+        JOIN order_items oi ON o.id = oi.order_id 
+        WHERE o.status = 'pending' 
+        AND o.order_date BETWEEN ? AND ? 
+        GROUP BY o.id 
+        ORDER BY o.order_date DESC 
+        LIMIT 10
+    ");
     $stmt_pending_orders->execute([$today_start, $today_end]);
     $pending_orders = $stmt_pending_orders->fetchAll(PDO::FETCH_ASSOC);
 
-    $stmt_low_stock_products = $conn->prepare("SELECT id, name, stock_quantity, image_url FROM products WHERE stock_quantity <= ? AND stock_quantity > 0 AND active = 1 ORDER BY stock_quantity ASC");
-    $stmt_low_stock_products->execute([$low_stock_threshold]);
+    // Pagination setup for low stock products
+    $low_stock_page = isset($_GET['low_stock_page']) && is_numeric($_GET['low_stock_page']) ? (int)$_GET['low_stock_page'] : 1;
+    $low_stock_limit = 5;
+    $low_stock_offset = ($low_stock_page - 1) * $low_stock_limit;
+
+    // Count total low stock products (active only)
+    $stmt_total_low_stock = $conn->prepare("
+        SELECT COUNT(*) 
+        FROM products 
+        WHERE stock_quantity <= ? 
+        AND stock_quantity > 0 
+        AND active = 1
+    ");
+    $stmt_total_low_stock->execute([$low_stock_threshold]);
+    $total_low_stock = $stmt_total_low_stock->fetchColumn();
+    $total_low_stock_pages = ceil($total_low_stock / $low_stock_limit);
+
+    // Fetch paginated low stock products
+    $stmt_low_stock_products = $conn->prepare("
+        SELECT id, name, stock_quantity, image_url 
+        FROM products 
+        WHERE stock_quantity <= :threshold 
+        AND stock_quantity > 0 
+        AND active = 1 
+        ORDER BY stock_quantity ASC 
+        LIMIT :limit OFFSET :offset
+    ");
+    $stmt_low_stock_products->bindValue(':threshold', $low_stock_threshold, PDO::PARAM_INT);
+    $stmt_low_stock_products->bindValue(':limit', $low_stock_limit, PDO::PARAM_INT);
+    $stmt_low_stock_products->bindValue(':offset', $low_stock_offset, PDO::PARAM_INT);
+    $stmt_low_stock_products->execute();
     $low_stock_products = $stmt_low_stock_products->fetchAll(PDO::FETCH_ASSOC);
 
 } catch (PDOException $e) {
     error_log("Error fetching dashboard data: " . $e->getMessage());
     $error_message = "Unable to load dashboard data.";
 }
-
 ?>
 
 <div class="admin-wrapper">
@@ -116,6 +170,8 @@ try {
                         <?php endif; ?>
                     </tbody>
                 </table>
+                
+
             </div>
         </div>
 
@@ -157,6 +213,15 @@ try {
                          <?php endif; ?>
                     </tbody>
                 </table>
+                <?php if ($total_low_stock_pages > 1): ?>
+                    <div class="pagination-container">
+                        <?php for ($i = 1; $i <= $total_low_stock_pages; $i++): ?>
+                            <a href="?low_stock_page=<?= $i ?>" class="pagination-link <?= ($low_stock_page == $i) ? 'active' : '' ?>">
+                                <?= $i ?>
+                            </a>
+                        <?php endfor; ?>
+                    </div>
+                <?php endif; ?>
             </div>
         </div>
 
@@ -166,3 +231,31 @@ try {
 <?php
 // Add any necessary scripts here
 ?>
+
+<style>
+    .pagination-container {
+    text-align: center;
+    margin-top: 15px;
+}
+
+.pagination-link {
+    display: inline-block;
+    padding: 6px 12px;
+    margin: 2px;
+    border-radius: 6px;
+    background-color: #e5e7eb;
+    color: #333;
+    text-decoration: none;
+    transition: background-color 0.3s ease;
+}
+
+.pagination-link:hover {
+    background-color: #d1d5db;
+}
+
+.pagination-link.active {
+    background-color: #9f86c0;
+    color: white;
+}
+
+</style>
