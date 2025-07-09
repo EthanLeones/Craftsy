@@ -114,7 +114,7 @@ CREATE TABLE `products` (
 --
 
 INSERT INTO `products` (`id`, `name`, `description`, `price`, `active`, `category`, `stock_quantity`, `image_url`, `created_at`, `updated_at`) VALUES
-(1, 'test2', 'test123', 100.00, 1, NULL, 0, 'images/products/28f8203c044584e1b922d9df00fd2d05.jpg', '2025-05-26 17:41:39', '2025-07-09 10:53:17'),
+(1, 'test', 'test123', 100.00, 0, NULL, 0, 'images/products/28f8203c044584e1b922d9df00fd2d05.jpg', '2025-05-26 17:41:39', '2025-07-09 10:53:17'),
 (2, 'Black Bunny Luxe Pouch', 'Height 6 inches\r\nLength 10 inches', 200.00, 1, 'Pouch', 200, 'images/products/5433c7fe2605598fedd7a6c816f38426.png', '2025-05-27 00:23:50', '2025-07-09 11:16:52'),
 (3, 'Zebra Zippered Pouch', 'Height 5 inches\r\nLength 9 inches', 200.00, 1, 'Pouch', 20, 'images/products/00ef278f5dbe3a19dd460d8c452228d4.png', '2025-05-27 00:26:20', '2025-07-09 10:53:17'),
 (4, 'Checkered pouch', 'Height 5 inches\r\nLength 9 inches', 200.00, 1, 'Pouch', 20, 'images/products/c396184bcddf4e8d8fc7909dfeaa4bc9.png', '2025-05-27 00:29:45', '2025-07-09 10:53:17'),
