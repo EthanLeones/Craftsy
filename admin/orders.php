@@ -64,13 +64,6 @@ try {
                 </div>
             </div>
 
-            <div class="kpi-card">
-                <div class="card-icon"><i class="fas fa-truck"></i></div>
-                <div class="card-details">
-                    <div class="card-value"><?php echo $shipped_orders_count; ?></div>
-                    <div class="card-label">Num of Shipped Orders</div>
-                </div>
-            </div>
 
             <div class="kpi-card">
                  <div class="card-icon"><i class="fas fa-check-circle"></i></div>
