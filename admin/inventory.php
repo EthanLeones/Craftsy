@@ -30,12 +30,11 @@ try {
     $out_of_stock_count = $stmt_out_of_stock->fetchColumn();
 
     $thirty_days_ago = date('Y-m-d H:i:s', strtotime('-30 days'));
-    $stmt_top_selling = $conn->prepare("SELECT p.id, p.name, p.stock_quantity, p.price, p.image_url, SUM(oi.quantity) as sold_count, SUM(oi.quantity * oi.price_at_time) as revenue FROM order_items oi JOIN products p ON oi.product_id = p.id JOIN orders o ON oi.order_id = o.id WHERE o.order_date >= ? GROUP BY p.id ORDER BY sold_count DESC LIMIT 10"); // Limit to top 10
+    $stmt_top_selling = $conn->prepare("SELECT p.id, p.name, p.stock_quantity, p.price, p.image_url, SUM(oi.quantity) as sold_count, SUM(oi.quantity * oi.price_at_time) as revenue FROM order_items oi JOIN products p ON oi.product_id = p.id JOIN orders o ON oi.order_id = o.id WHERE o.order_date >= ? AND active = 1 GROUP BY p.id ORDER BY sold_count DESC LIMIT 10"); // Limit to top 10
     $stmt_top_selling->execute([$thirty_days_ago]);
     $top_selling_products = $stmt_top_selling->fetchAll(PDO::FETCH_ASSOC);
 
-
-    $stmt_low_stock_products = $conn->prepare("SELECT id, name, stock_quantity, price, image_url FROM products WHERE stock_quantity <= ? AND stock_quantity > 0 ORDER BY stock_quantity ASC");
+    $stmt_low_stock_products = $conn->prepare("SELECT id, name, stock_quantity, price, image_url FROM products WHERE stock_quantity <= ? AND stock_quantity > 0  AND active = 1 ORDER BY stock_quantity ASC");
     $stmt_low_stock_products->execute([$low_stock_threshold]);
     $low_stock_products = $stmt_low_stock_products->fetchAll(PDO::FETCH_ASSOC);
 

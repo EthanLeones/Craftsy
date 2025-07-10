@@ -43,7 +43,7 @@ if ($user_id) {
                 <div class="checkout-shipping">
                     <h2>Shipping Address</h2>
                      <?php if (empty($user_addresses)): ?>
-                         <p style="text-align: center;">Please add a shipping address in your <a href="profile.php">profile</a>.</p>
+                         <p style="text-align: center;">Please add a shipping address in your <a href="add_address_inline.php">profile</a>.</p>
                      <?php else: ?>
                         <div class="address-list">
                             <?php foreach ($user_addresses as $address): ?>

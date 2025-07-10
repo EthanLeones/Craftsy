@@ -76,8 +76,15 @@ if ($user_id) {
                                  <p><strong><?php echo $address['is_default'] ? 'Default Address' : 'Address'; ?></strong></p>
                                  <pre><?php echo htmlspecialchars($address['address_line1']); ?><br><?php echo htmlspecialchars($address['address_line2']); ?><br><?php echo htmlspecialchars($address['city']); ?>, <?php echo htmlspecialchars($address['state_province']); ?> <?php echo htmlspecialchars($address['postal_code']); ?><br><?php echo htmlspecialchars($address['country']); ?><br>Contact: <?php echo htmlspecialchars($address['contact_number']); ?></pre>
                                  <div class="address-actions">
-                                     <a href="edit_address.php?id=<?php echo htmlspecialchars($address['id']); ?>" class="button small">Edit</a>
-                                     <a href="delete_address.php?id=<?php echo htmlspecialchars($address['id']); ?>" class="button small danger" onclick="return confirm('Are you sure you want to delete this address?');">Delete</a>
+                                     <form action="edit_address.php" method="post" style="display: inline;">
+                                        <input type="hidden" name="id" value="<?php echo htmlspecialchars($address['id']); ?>">
+                                        <button type="submit" class="button small">Edit</button>
+                                    </form>
+
+                                    <form action="delete_address.php" method="post" style="display: inline;" onsubmit="return confirm('Are you sure you want to delete this address?');">
+                                        <input type="hidden" name="id" value="<?php echo htmlspecialchars($address['id']); ?>">
+                                        <button type="submit" class="button small danger">Delete</button>
+                                    </form>
                                  </div>
                              </div>
                          <?php endforeach; ?>

@@ -26,6 +26,7 @@
             <input type="password" id="confirm_password" name="confirm_password" required>
         </div>
         <button type="submit" name="register">Register</button>
+        
     </form>
     <p class="login-link">Already have an account? <a href="login.php">Login here</a></p>
 </div>

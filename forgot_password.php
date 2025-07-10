@@ -4,14 +4,21 @@ $page_title = 'Forgot Password';
 include 'header.php';
 ?>
 
-<div class="forgot-password-container" style="max-width: 400px; margin: 40px auto; background: #fff; border-radius: 8px; box-shadow: 0 2px 8px #0001; padding: 32px;">
+<div class="forgot-password-container" style=" margin: 40px auto; background: #fff; border-radius: 8px; box-shadow: 0 2px 8px #0001; padding: 32px;">
     <h1 class="page-title">Forgot Password</h1>
     <form id="forgot-email-form">
         <div class="form-group">
             <label for="fp-email">Enter your email address:</label>
             <input type="email" id="fp-email" name="email" required autocomplete="email">
         </div>
-        <button type="submit">Next</button>
+        <div style="display: flex; justify-content: space-between; align-items: center; gap: 10px;">
+            <a href="login.php" style="display: inline-block; padding: 10px 22px; background: #e0b1cb; color: #231942; border-radius: 5px; text-decoration: none; font-weight: 600; transition: background 0.2s;">
+                &larr; Back to Login
+            </a>
+            <button type="submit" style="padding: 10px 22px; border-radius: 5px; background: #5E548E; color: #fff; border: none; font-weight: 600;">
+                Next &rarr;
+            </button>
+        </div>
     </form>
     <form id="reset-password-form" style="display:none;">
         <input type="hidden" id="fp-user-id" name="user_id">
@@ -97,7 +104,7 @@ resetForm.addEventListener('submit', function(e) {
 .forgot-password-container button { padding: 10px 22px; border-radius: 4px; background: #5E548E; color: #fff; border: none; font-weight: 600; }
 </style>
 
-<?php include 'footer.php'; ?>
+
 
 <?php
 if (isset($_SESSION['alert'])) {
@@ -106,4 +113,6 @@ if (isset($_SESSION['alert'])) {
     echo "<script>alert(\'" . addslashes($alert_message) . "\');</script>";
     unset($_SESSION['alert']); // Clear the session variable
 }
-?> 
+?>
+
+<?php include 'footer.php'; ?>
