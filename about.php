@@ -1,6 +1,6 @@
 <?php $page_title = 'About Us'; ?>
 <?php include 'header.php'; ?>
-
+/* asdaskdjad */ 
 <style>
     .about-content {
         display: flex;
@@ -8,7 +8,6 @@
         gap: 30px;
         align-items: center;
     }
-
     .about-text {
         flex: 1 1 400px;
         background: #f8d5e6;
