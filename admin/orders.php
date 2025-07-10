@@ -27,6 +27,10 @@ try {
     $stmt_completed_orders->execute();
     $completed_orders_count = $stmt_completed_orders->fetchColumn() ?? 0;
 
+    $stmt_cancelled_orders = $conn->prepare("SELECT COUNT(*) FROM orders WHERE status = 'cancelled'");
+    $stmt_cancelled_orders->execute();
+    $cancelled_orders_count = $stmt_cancelled_orders->fetchColumn() ?? 0;
+
     $stmt_orders = $conn->prepare("
         SELECT o.*, u.username, COUNT(oi.id) as num_items
         FROM orders o
@@ -75,6 +79,14 @@ try {
                      <div class="card-label">Num of Completed Orders</div>
                  </div>
              </div>
+
+            <div class="kpi-card">
+                <div class="card-icon"><i class="fas fa-times-circle"></i></div>
+                <div class="card-details">
+                    <div class="card-value"><?php echo $cancelled_orders_count; ?></div>
+                    <div class="card-label">Num of Cancelled Orders</div>
+                </div>
+            </div>  
              <!-- Add more KPI cards here if needed -->
         </div>
 
@@ -104,6 +116,12 @@ try {
                             </tr>
                         <?php else: ?>
                             <?php foreach ($orders as $order): ?>
+                                <?php if ($order['is_deleted']): ?>
+                                    <?php continue;  ?>
+                                <?php endif; ?>
+                                <?php if ($order['status'] === 'delivered'): ?>
+                                    <?php continue; ?>
+                                <?php endif; ?>
                                 <tr>
                                     <td><?php echo htmlspecialchars($order['id']); ?></td>
                                     <td><?php echo htmlspecialchars($order['username']); ?></td>
@@ -114,9 +132,107 @@ try {
                                     <td>
                                         <button class="button small secondary view-order-button" data-id="<?php echo htmlspecialchars($order['id']); ?>">View</button>
                                         <button class="button small edit-order-button" data-id="<?php echo htmlspecialchars($order['id']); ?>" data-status="<?php echo htmlspecialchars($order['status']); ?>">Edit</button>
-                                        <button class="button small danger delete-order-button" data-id="<?php echo htmlspecialchars($order['id']); ?>">Delete</button>
+                                        
                                     </td>
                                 </tr>
+                            <?php endforeach; ?>
+                        <?php endif; ?>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="admin-section">
+            <h2>Delivered Orders</h2>
+            <div class="admin-table-container">
+                <table class="admin-table">
+                    <thead>
+                        <tr>
+                            <th>Order #</th>
+                            <th>Customer</th>
+                            <th>Date</th>
+                            <th># Items</th>
+                            <th>Total</th>
+                            <th>Status</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php if (isset($error_message)): ?>
+                             <tr>
+                                 <td colspan="7" style="text-align: center; color: red;"><?php echo $error_message; ?></td>
+                             </tr>
+                        <?php elseif (empty($orders)): ?>
+                            <tr>
+                                <td colspan="7" style="text-align: center;">No orders found.</td>
+                            </tr>
+                        <?php else: ?>
+                            <?php foreach ($orders as $order): ?>
+                                <?php if ($order['status'] === 'delivered'): ?>
+                                <tr>
+                                    <td><?php echo htmlspecialchars($order['id']); ?></td>
+                                    <td><?php echo htmlspecialchars($order['username']); ?></td>
+                                    <td><?php echo htmlspecialchars($order['order_date']); ?></td>
+                                    <td><?php echo htmlspecialchars($order['num_items']); ?></td>
+                                    <td>P<?php echo htmlspecialchars(number_format($order['total_amount'], 2)); ?></td>
+                                    <td><?php echo htmlspecialchars($order['status']); ?></td>
+                                    <td>
+                                        <button class="button small secondary view-order-button" data-id="<?php echo htmlspecialchars($order['id']); ?>">View</button>
+                                        <button class="button small edit-order-button" data-id="<?php echo htmlspecialchars($order['id']); ?>" data-status="<?php echo htmlspecialchars($order['status']); ?>">Edit</button>
+                                    </td>
+                                </tr>
+                                <?php endif; ?>
+                            <?php endforeach; ?>
+                        <?php endif; ?>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+
+        <div class="admin-section">
+            <h2>Cancelled Orders</h2>
+            <div class="admin-table-container">
+                <table class="admin-table">
+                    <thead>
+                        <tr>
+                            <th>Order #</th>
+                            <th>Customer</th>
+                            <th>Date</th>
+                            <th># Items</th>
+                            <th>Total</th>
+                            <th>Status</th> 
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php if (isset($error_message)): ?>
+                             <tr>
+                                 <td colspan="7" style="text-align: center; color: red;"><?php echo $error_message; ?></td>
+                             </tr>
+                        <?php elseif (empty($orders)): ?>
+                            <tr>
+                                <td colspan="7" style="text-align: center;">No orders found.</td>
+                            </tr>
+                        <?php else: ?>
+                            <?php foreach ($orders as $order): ?>
+                                <?php if ($order['status'] !== 'cancelled'): ?>
+                                    <?php continue; ?>
+                                <?php endif; ?>
+                                <?php if ($order['is_deleted']): ?>
+                                <tr>
+                                    <td><?php echo htmlspecialchars($order['id']); ?></td>
+                                    <td><?php echo htmlspecialchars($order['username']); ?></td>
+                                    <td><?php echo htmlspecialchars($order['order_date']); ?></td>
+                                    <td><?php echo htmlspecialchars($order['num_items']); ?></td>
+                                    <td>P<?php echo htmlspecialchars(number_format($order['total_amount'], 2)); ?></td>
+                                    <td><?php echo htmlspecialchars($order['status']); ?></td>
+                                    <td>
+                                        <button class="button small secondary view-order-button" data-id="<?php echo htmlspecialchars($order['id']); ?>">View</button>
+                                        <button class="button small edit-order-button" data-id="<?php echo htmlspecialchars($order['id']); ?>" data-status="<?php echo htmlspecialchars($order['status']); ?>">Edit</button>
+                                    </td>
+                                </tr>
+                                <?php endif; ?>
                             <?php endforeach; ?>
                         <?php endif; ?>
                     </tbody>
@@ -148,7 +264,7 @@ try {
                          <select id="edit_order_status" name="status" required>
                              <option value="pending">Pending</option>
                              <option value="processing">Processing</option>
-                             <option value="shipped">Shipping</option>
+                             <option value="shipping">Shipping</option>
                              <option value="delivered">Delivered</option>
                              <option value="cancelled">Cancelled</option>
                          </select>
@@ -171,7 +287,6 @@ document.addEventListener('DOMContentLoaded', function() {
     const closeButtons = document.querySelectorAll('.modal .close-button');
     const viewOrderButtons = document.querySelectorAll('.view-order-button');
     const editOrderButtons = document.querySelectorAll('.edit-order-button');
-    const deleteOrderButtons = document.querySelectorAll('.delete-order-button');
     const orderDetailsContent = document.getElementById('order-details-content');
     const editOrderStatusSelect = document.getElementById('edit_order_status');
     const editOrderIdInput = document.getElementById('edit_order_id');
@@ -212,36 +327,6 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
-     deleteOrderButtons.forEach(button => {
-         button.addEventListener('click', function(event) {
-             const orderId = this.getAttribute('data-id');
-             console.log('Delete order with ID:', orderId);
-
-             // If confirmed, redirect to delete script
-              // event.preventDefault(); // Prevent default if using AJAX for deletion
-              // window.location.href = 'process_delete_order.php?id=' + orderId; // Simple redirect deletion
-
-             // Or use AJAX for deletion for a smoother experience (example structure):
-             if (confirm('Are you sure you want to delete this order?')) {
-                 fetch('process_delete_order.php', {
-                     method: 'POST',
-                     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                     body: 'order_id=' + orderId
-                 })
-                 .then(response => response.json())
-                 .then(data => {
-                     if (data.success) {
-                         window.location.reload(); 
-                     } else {
-                          console.error('Error deleting order:', data.message || 'Unknown error'); 
-                     }
-                 })
-                 .catch(error => {
-                     console.error('AJAX Error deleting order:', error);
-                 });
-             }
-         });
-     });
 
 
     editOrderForm.addEventListener('submit', function(event) {
