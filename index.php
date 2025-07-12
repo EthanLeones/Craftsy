@@ -6,142 +6,191 @@ require_once 'includes/session.php';
 
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
 <style>
-    .feature-item img {
-        max-width: 80px;
-        height: auto;
-        display: block;
-        margin: 0 auto 15px auto;
-    }
 
-    .features {
+    .container2 {
         display: flex;
-        justify-content: space-around;
+        justify-content: center;
+        align-items: center;
+        padding-top: 5rem;
+        gap: 15rem;
         flex-wrap: wrap;
-        gap: 20px;
     }
 
-    .feature-item {
-        flex: 1 1 250px;
+        .handbag {
+        flex: 1;
+        max-width: 300px;
         text-align: center;
-        padding: 20px;
-        border: 1px solid #e0b1cb;
-        border-radius: 8px;
-        background-color: #fff;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-    }
-
-     .feature-item h3 {
-         color: #5e548e;
-         margin-bottom: 10px;
-     }
-
-     .feature-item p {
-         color: #231942;
-         font-size: 0.9em;
-     }
-
-    .hero-section {
-        text-align: center;
-        padding: 90px 20px 70px 20px;
-        background-color: #f8d5e6;
-        color: #231942;
-        margin-bottom: 40px;
-        border-radius: 0 0 32px 32px;
-        box-shadow: 0 8px 32px rgba(224, 177, 203, 0.18);
-        position: relative;
-    }
-    .hero-section img {
-        max-width: 220px;
-        width: 100%;
-        margin: 0 auto 32px auto;
-        display: block;
-        filter: drop-shadow(0 4px 16px #e0b1cb88);
-    }
-    .hero-section h1 {
-        font-family: 'Playfair Display', serif;
-        font-size: 3.2rem;
-        font-weight: 700;
-        margin-bottom: 18px;
-        color: #5E548E;
-        letter-spacing: 1.5px;
-        text-shadow: 0 2px 8px #e0b1cb33;
-    }
-    .hero-section p {
-        font-family: 'Montserrat', sans-serif;
-        font-size: 1.5rem;
-        font-weight: 500;
-        color: #231942;
-        margin-bottom: 32px;
-        letter-spacing: 0.5px;
-    }
-    .hero-buttons a {
-        font-family: 'Montserrat', sans-serif;
-        font-size: 1.15rem;
-        font-weight: 700;
-        padding: 14px 32px;
-        margin: 0 12px;
-        background-color: #5E548E;
         color: #fff;
-        border-radius: 6px;
-        text-decoration: none;
-        box-shadow: 0 2px 8px #e0b1cb44;
-        transition: background 0.3s, color 0.3s, box-shadow 0.3s;
+        }
+
+        .handbag img {
+            width: 150%; 
+            height: auto;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            transform: translateX(-16%); 
+        }
+
+        .label {
+        font-size: 33px;
+        font-weight: bold;
+        margin-top: 15px;
+        }
+
+        .subtext {
+        font-size: 18px;
+        margin-top: 5px;
+        opacity: 0.8;
     }
-    .hero-buttons a:hover {
-        background-color: #e0b1cb;
-        color: #231942;
-        box-shadow: 0 4px 16px #e0b1cb88;
+
+    body {
+        scroll-behavior: smooth;
+        scroll-snap-type: y mandatory;
+        overflow-y: scroll;
+        margin: 0;
+        padding: 0;
+
+    }
+
+    section {
+        margin: 0;
+        padding: 0;
+        height: 100vh;
+        max-width: 100%;
+        scroll-snap-align: start;
+        background-size: cover;
+        background-position: center;
+        border: none;
+        gap: 0;
+    }
+
+    .section1 {
+        scroll-snap-align: start;
+        height: 100vh;
+        margin: 0;
+        padding: 0;
+        border: none;
+        background-image: url('images/bg1.png');
+        background-size: cover;
+        background-position: center;
+    }
+
+    .section2 {
+        scroll-snap-align: start;
+        height: 100vh;
+        margin: 0;
+        padding: 0;
+        border: none;
+        background-color: #3f1a41;
+    }
+
+    .section3 {
+        scroll-snap-align: start;
+        height: 70vh;
+        margin: 0;
+        padding: 0;
+        border: none;
+        background-color: #231942;
+        background-image: url('images/bg3.png');
+        background-size: cover;
+        background-position: center;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    
+    .handbag-text {
+        position: absolute;
+        top: 30%;
+        left: 5%;
+        background-color: #231942;
+        opacity: 0.8;
+        color: white;
+        text-align: left;
+        z-index: 1;
+        max-width: 700px;
+        padding-left: 1rem;
+        margin: 0;
+    }
+
+    .handbag-text h1 {
+        font-size: 2.5rem;
+        font-weight: 500;
+        padding-bottom: 0;
+        letter-spacing: 1px;
+    }
+
+    .handbag-text p {
+        font-size: 1.4rem;
+        line-height: 1.6;
+    }
+
+    .newsletter {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        padding: 2rem;
+        color:rgb(255, 255, 255);
+    }
+    .newsletter h1 {
+        margin-top: 10rem;
+        font-size: 2.5rem;
+        font-weight: 700;
+        margin-bottom: 0.3rem;
+    }
+
+    .newsletter p {
+        margin-top: 0;
+        font-size: 1.2rem;
     }
 </style>
 
-    <section class="hero-section">
-        <img src="images/logo.jpg" alt="Craftsy Nook Logo">
-        <h1>Handcrafted Bayong Bags</h1>
-        <p>Discover our collection of beautifully crafted Filipino bags that blend tradition with modern style.</p>
-        <div class="hero-buttons">
-            <a href="shop.php" class="shop-now">Shop Now</a>
-            <a href="about.php" class="learn-more">Learn More</a>
+    <body>
+        <div class="section section1">
+            <div class="handbag-text">
+                <h1>HANDCRAFTED BAYONG BAGS</h1>
+                <p>Discover our collection of beautifully crafted Filipino bags that blend tradition with modern style.</p>
+            </div>
         </div>
-    </section>
+        <div class="section section2">
+            <div class="container2">
+                <div class="handbag">
+                    <img src="images/handbag1.png" alt="Handcrafted handbag with sunflowers">
+                    <div class="label">handcrafted</div>
+                    <div class="subtext">carefully made by skilled artisans</div>
+                </div>
+                <div class="handbag">
+                    <img src="images/handbag2.png" alt="Sustainable handbag with purple flowers">
+                    <div class="label">sustainable</div>
+                    <div class="subtext">eco-friendly materials and practices</div>
+                </div>
+                <div class="handbag">
+                    <img src="images/handbag3.png" alt="Unique handbag with yellow flowers">
+                    <div class="label">unique</div>
+                    <div class="subtext">one-of-a-kind designs for every style</div>
+                </div>
+            </div>
 
-    <div class="container">
-        <div class="featured-products-section" style="text-align: center; margin-bottom: 40px;">
-            <h2 class="section-title">Featured Products</h2>
-            <img src="images/offer-img.png" alt="Special Offer" style="max-width: 100%; height: auto; margin-top: 20px; display: block; margin-left: auto; margin-right: auto;">
         </div>
-    </div>
+        <div class="section section3">
+            <div class = "newsletter">
+                <h1>STAY UPDATED</h1>
+                <p>subscribe to our newsletter for exclusive offers and updates</p>
 
-     <div class="container">
-         <div class="features">
-             <div class="feature-item">
-                 <img src="images/hand-icon.png" alt="Handcrafted Icon">
-                 <h3>Handcrafted</h3>
-                 <p>Each piece is carefully made by skilled artisans</p>
-             </div>
-              <div class="feature-item">
-                 <img src="images/sus-icon.png" alt="Sustainable Icon">
-                 <h3>Sustainable</h3>
-                 <p>Eco-friendly materials and practices</p>
-             </div>
-              <div class="feature-item">
-                 <img src="images/unique-icon.png" alt="Unique Icon">
-                 <h3>Unique</h3>
-                 <p>One-of-a-kind designs for every style</p>
-             </div>
-         </div>
-     </div>
+                <form action="subscribe_newsletter.php" method="post" style="display: flex; flex-direction: column; align-items: center; gap: 10px;">
+                    <input type="email" name="email" placeholder="Enter your email address" required style="padding: 10px; width: 300px; border-radius: 5px; border: 1px solid #ccc; opacity: 0.8;">
+                    <button type="submit">Subscribe</button>
+                </form>
+            </div>
+        </div>
+    </body>
 
-    <section class="stay-updated">
-        <h2>Stay Updated</h2>
-        <p>Subscribe to our newsletter for exclusive offers and updates</p>
+</html>
 
-        <form action="subscribe_newsletter.php" method="post">
-            <input type="email" name="email" placeholder="Enter your email address" required>
-            <button type="submit">Subscribe</button>
-        </form>
-    </section>
-
-</div> <!-- Close container from header.php -->
+</div> 
 
 <?php include 'footer.php'; ?>
 
@@ -153,5 +202,25 @@ if (isset($_SESSION['alert'])) {
     echo "showToast('" . addslashes($alert_message) . "', '" . ($alert_type === 'success' ? 'success' : 'error') . "');";
     unset($_SESSION['alert']);
 }
-?> //inakoy
+
+
+?> 
+
+
+function showToast(message, type) {
+    const toast = document.createElement('div');
+    toast.className = 'toast ' + type;
+    toast.textContent = message;
+    document.body.appendChild(toast);
+    setTimeout(() => {
+        toast.classList.add('show');
+        setTimeout(() => {
+            toast.classList.remove('show');
+            setTimeout(() => {
+                document.body.removeChild(toast);
+            }, 300);
+        }, 3000);
+    }, 100);
+}
+
 </script>

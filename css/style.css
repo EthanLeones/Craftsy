@@ -1,10 +1,17 @@
 /* Global Styles */
 
+html,
+body {
+    margin: 0;
+    padding: 0;
+    scroll-behavior: smooth;
+}
+
 body {
     font-family: "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
     margin: 0;
     padding: 0;
-    background-color: #F5F5F5;
+    background-color: #ffffff;
     color: #231942;
     min-height: 100vh;
 }
@@ -300,22 +307,26 @@ body.admin-page {
 /* Container and Layout */
 
 .container {
-    width: 90%;
-    margin: 40px auto;
-    max-width: 1200px;
+    width: 100%;
+    border: none;
+    margin: 0;
+    padding: 0;
 }
 
 .main-content {
-    padding-top: 60px;
-    padding-bottom: 120px;
+    background-color: white;
+    border: none;
+    margin: 0;
+    padding: 0;
+    gap: 0;
 }
 
 
 /* Footer Styles */
 
 .footer {
-    background-color: #231942;
-    color: white;
+    background-color: #ffffff;
+    color: #1a1433;
     padding: 40px 20px;
     margin-top: auto;
 }
@@ -328,27 +339,26 @@ body.admin-page {
 }
 
 .footer-col h4 {
-    color: #fff;
+    color: #1a1433;
     margin-bottom: 20px;
 }
 
 .footer-col a {
-    color: #fff;
+    color: #1a1433;
     text-decoration: none;
     display: block;
     margin-bottom: 10px;
 }
 
 .footer-col a:hover {
-    color: #5E548E;
+    color: #6A0DAD;
+    /* Optional: Keep some personality in hover */
 }
 
 .footer-bottom {
-    background-color: #1a1433;
-    color: white;
+    background-color: #ffffff;
+    color: #1a1433;
     text-align: center;
-    padding: 20px;
-    margin-top: 20px;
 }
 
 

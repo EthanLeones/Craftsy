@@ -46,13 +46,6 @@ $current_page = basename($_SERVER['PHP_SELF']);
             display: block;
         }
 
-        body {
-            background-image: url('images/background.jpg');
-            background-size: cover;
-            background-repeat: no-repeat;
-            background-attachment: fixed;
-            background-position: center center;
-        }
     </style>
 </head>
 <body>
@@ -103,11 +96,10 @@ $current_page = basename($_SERVER['PHP_SELF']);
     <div class="container main-content">
 
 <?php
-// Check for session alert message and display as JavaScript alert
-// if (isset($_SESSION['alert'])) {
-//     $alert_type = $_SESSION['alert']['type'];
-//     $alert_message = $_SESSION['alert']['message'];
-//     echo "<script>alert('" . addslashes($alert_message) . "');</script>";
-//     unset($_SESSION['alert']); // Clear the session variable
-// }
+if (isset($_SESSION['alert'])) {
+    $alert_type = $_SESSION['alert']['type'];
+    $alert_message = $_SESSION['alert']['message'];
+    echo "<script>alert('" . addslashes($alert_message) . "');</script>";
+    unset($_SESSION['alert']);
+}
 ?>
