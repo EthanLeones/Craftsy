@@ -6,7 +6,6 @@ require_once 'includes/session.php';
 
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
 <style>
-
     .container2 {
         display: flex;
         justify-content: center;
@@ -16,28 +15,28 @@ require_once 'includes/session.php';
         flex-wrap: wrap;
     }
 
-        .handbag {
+    .handbag {
         flex: 1;
         max-width: 300px;
         text-align: center;
         color: #fff;
-        }
+    }
 
-        .handbag img {
-            width: 150%; 
-            height: auto;
-            border-radius: 8px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-            transform: translateX(-16%); 
-        }
+    .handbag img {
+        width: 150%;
+        height: auto;
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        transform: translateX(-16%);
+    }
 
-        .label {
+    .label {
         font-size: 33px;
         font-weight: bold;
         margin-top: 15px;
-        }
+    }
 
-        .subtext {
+    .subtext {
         font-size: 18px;
         margin-top: 5px;
         opacity: 0.8;
@@ -99,7 +98,7 @@ require_once 'includes/session.php';
         align-items: center;
     }
 
-    
+
     .handbag-text {
         position: absolute;
         top: 30%;
@@ -133,8 +132,9 @@ require_once 'includes/session.php';
         justify-content: center;
         text-align: center;
         padding: 2rem;
-        color:rgb(255, 255, 255);
+        color: rgb(255, 255, 255);
     }
+
     .newsletter h1 {
         margin-top: 10rem;
         font-size: 2.5rem;
@@ -146,81 +146,130 @@ require_once 'includes/session.php';
         margin-top: 0;
         font-size: 1.2rem;
     }
+
+    /* Responsive adjustments for .container2 and .handbag */
+    @media (max-width: 1200px) {
+        .container2 {
+            gap: 5rem;
+            padding-top: 2rem;
+        }
+    }
+
+    @media (max-width: 900px) {
+        .container2 {
+            flex-direction: column;
+            align-items: center;
+            gap: 2rem;
+            padding-top: 1.5rem;
+        }
+
+        .handbag img {
+            width: 100%;
+            transform: none;
+        }
+
+        .handbag {
+            max-width: 90vw;
+        }
+    }
+
+    @media (max-width: 600px) {
+        .handbag {
+            max-width: 100vw;
+        }
+
+        .label {
+            font-size: 1.3em;
+        }
+
+        .subtext {
+            font-size: 1em;
+        }
+
+        .newsletter h1 {
+            margin-top: 2rem;
+            font-size: 1.5rem;
+        }
+
+        .newsletter input[type="email"] {
+            width: 90vw !important;
+            font-size: 1em;
+        }
+    }
 </style>
 
-    <body>
-        <div class="section section1">
-            <div class="handbag-text">
-                <h1>HANDCRAFTED BAYONG BAGS</h1>
-                <p>Discover our collection of beautifully crafted Filipino bags that blend tradition with modern style.</p>
+<body>
+    <div class="section section1">
+        <div class="handbag-text">
+            <h1>HANDCRAFTED BAYONG BAGS</h1>
+            <p>Discover our collection of beautifully crafted Filipino bags that blend tradition with modern style.</p>
+        </div>
+    </div>
+    <div class="section section2">
+        <div class="container2">
+            <div class="handbag">
+                <img src="images/handbag1.png" alt="Handcrafted handbag with sunflowers">
+                <div class="label">handcrafted</div>
+                <div class="subtext">carefully made by skilled artisans</div>
+            </div>
+            <div class="handbag">
+                <img src="images/handbag2.png" alt="Sustainable handbag with purple flowers">
+                <div class="label">sustainable</div>
+                <div class="subtext">eco-friendly materials and practices</div>
+            </div>
+            <div class="handbag">
+                <img src="images/handbag3.png" alt="Unique handbag with yellow flowers">
+                <div class="label">unique</div>
+                <div class="subtext">one-of-a-kind designs for every style</div>
             </div>
         </div>
-        <div class="section section2">
-            <div class="container2">
-                <div class="handbag">
-                    <img src="images/handbag1.png" alt="Handcrafted handbag with sunflowers">
-                    <div class="label">handcrafted</div>
-                    <div class="subtext">carefully made by skilled artisans</div>
-                </div>
-                <div class="handbag">
-                    <img src="images/handbag2.png" alt="Sustainable handbag with purple flowers">
-                    <div class="label">sustainable</div>
-                    <div class="subtext">eco-friendly materials and practices</div>
-                </div>
-                <div class="handbag">
-                    <img src="images/handbag3.png" alt="Unique handbag with yellow flowers">
-                    <div class="label">unique</div>
-                    <div class="subtext">one-of-a-kind designs for every style</div>
-                </div>
-            </div>
 
-        </div>
-        <div class="section section3">
-            <div class = "newsletter">
-                <h1>STAY UPDATED</h1>
-                <p>subscribe to our newsletter for exclusive offers and updates</p>
+    </div>
+    <div class="section section3">
+        <div class="newsletter">
+            <h1>STAY UPDATED</h1>
+            <p>subscribe to our newsletter for exclusive offers and updates</p>
 
-                <form action="subscribe_newsletter.php" method="post" style="display: flex; flex-direction: column; align-items: center; gap: 10px;">
-                    <input type="email" name="email" placeholder="Enter your email address" required style="padding: 10px; width: 300px; border-radius: 5px; border: 1px solid #ccc; opacity: 0.8;">
-                    <button type="submit">Subscribe</button>
-                </form>
-            </div>
+            <form action="subscribe_newsletter.php" method="post" style="display: flex; flex-direction: column; align-items: center; gap: 10px;">
+                <input type="email" name="email" placeholder="Enter your email address" required style="padding: 10px; width: 300px; border-radius: 5px; border: 1px solid #ccc; opacity: 0.8;">
+                <button type="submit">Subscribe</button>
+            </form>
         </div>
-    </body>
+    </div>
+</body>
 
 </html>
 
-</div> 
+</div>
 
 <?php include 'footer.php'; ?>
 
 <script>
-<?php
-if (isset($_SESSION['alert'])) {
-    $alert_type = $_SESSION['alert']['type'];
-    $alert_message = $_SESSION['alert']['message'];
-    echo "showToast('" . addslashes($alert_message) . "', '" . ($alert_type === 'success' ? 'success' : 'error') . "');";
-    unset($_SESSION['alert']);
-}
+    <?php
+    if (isset($_SESSION['alert'])) {
+        $alert_type = $_SESSION['alert']['type'];
+        $alert_message = $_SESSION['alert']['message'];
+        echo "showToast('" . addslashes($alert_message) . "', '" . ($alert_type === 'success' ? 'success' : 'error') . "');";
+        unset($_SESSION['alert']);
+    }
 
 
-?> 
+    ?>
 
 
-function showToast(message, type) {
-    const toast = document.createElement('div');
-    toast.className = 'toast ' + type;
-    toast.textContent = message;
-    document.body.appendChild(toast);
-    setTimeout(() => {
-        toast.classList.add('show');
+    function showToast(message, type) {
+        const toast = document.createElement('div');
+        toast.className = 'toast ' + type;
+        toast.textContent = message;
+        document.body.appendChild(toast);
         setTimeout(() => {
-            toast.classList.remove('show');
+            toast.classList.add('show');
             setTimeout(() => {
-                document.body.removeChild(toast);
-            }, 300);
-        }, 3000);
-    }, 100);
-}
-
+                toast.classList.remove('show');
+                setTimeout(() => {
+                    document.body.removeChild(toast);
+                }, 300);
+            }, 3000);
+        }, 100);
+    }
 </script>

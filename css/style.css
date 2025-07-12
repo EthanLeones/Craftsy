@@ -306,6 +306,10 @@ body.admin-page {
 
 /* Container and Layout */
 
+body.shop-page {
+    background-color: #3f1a41 !important;
+}
+
 .container {
     width: 100%;
     border: none;
