@@ -34,8 +34,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
             
 
-            $_SESSION['alert'] = ['type' => 'success', 'message' => 'Login successful!'];
-
             if (isset($_SESSION['user_role']) && $_SESSION['user_role'] === 'admin') {
                 header('Location: admin/dashboard.php');
             } else {

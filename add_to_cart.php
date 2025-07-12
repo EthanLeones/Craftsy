@@ -2,7 +2,7 @@
 require_once 'includes/session.php';
 require_once 'config/database.php';
 
-header('Content-Type: application/json'); 
+header('Content-Type: application/json');
 
 $response = ['success' => false, 'message' => 'An error occurred.'];
 
@@ -65,7 +65,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $response['success'] = true;
         $response['message'] = 'Product added to cart!';
         $response['cart_count'] = getCartCount();
-
     } catch (PDOException $e) {
         error_log("Add to cart error: " . $e->getMessage());
         $response['message'] = 'Database error. Could not add item to cart.';

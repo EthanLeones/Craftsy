@@ -270,7 +270,7 @@ if (!$product) {
         <span class="price">P <?php echo htmlspecialchars(number_format($product['price'], 2)); ?></span>
         <hr class="divider">
         <?php if ($product['stock_quantity'] > 0): ?>
-            <form action="add_to_cart.php" method="post" class="add-to-cart-form">
+            <form id="add-to-cart-form" class="add-to-cart-form">
                 <input type="hidden" name="product_id" value="<?php echo htmlspecialchars($product['id']); ?>">
                 <div class="quantity-controls">
                     <button type="button" onclick="changeQty(-1)">-</button>
@@ -290,19 +290,6 @@ if (!$product) {
 
 <?php include 'footer.php'; ?>
 
-<?php
-// Check for session alert message and display as JavaScript alert
-if (isset($_SESSION['alert'])) {
-    $alert = $_SESSION['alert'];
-    echo "<script>
-            document.addEventListener('DOMContentLoaded', function() {
-                alert('" . addslashes($alert['message']) . "');
-            });
-          </script>";
-    unset($_SESSION['alert']);
-}
-?>
-
 <script>
     function changeQty(delta) {
         const qtyInput = document.getElementById('quantity');
@@ -314,4 +301,48 @@ if (isset($_SESSION['alert'])) {
         if (val > max) val = max;
         qtyInput.value = val;
     }
+
+    // Handle add to cart form submission with AJAX
+    document.addEventListener('DOMContentLoaded', function() {
+        const form = document.getElementById('add-to-cart-form');
+        if (form) {
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+
+                const formData = new FormData(form);
+
+                fetch('add_to_cart.php', {
+                        method: 'POST',
+                        body: formData
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            showToast(data.message, 'success');
+                            // Update cart count if available
+                            if (data.cart_count && document.querySelector('.cart-count')) {
+                                document.querySelector('.cart-count').textContent = data.cart_count;
+                            }
+                        } else {
+                            showToast(data.message, 'error');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        showToast('An error occurred while adding to cart.', 'error');
+                    });
+            });
+        }
+    });
+
+    <?php
+    // Check for session alert message and display as toast
+    if (isset($_SESSION['alert'])) {
+        $alert = $_SESSION['alert'];
+        echo "document.addEventListener('DOMContentLoaded', function() {
+                showToast('" . addslashes($alert['message']) . "', '" . ($alert['type'] === 'success' ? 'success' : 'error') . "');
+            });";
+        unset($_SESSION['alert']);
+    }
+    ?>
 </script>

@@ -360,3 +360,16 @@ try {
     </div>
 </div>
 <?php include 'footer.php'; ?>
+
+<script>
+    <?php
+    // Check for session alert message and display as toast
+    if (isset($_SESSION['alert'])) {
+        $alert = $_SESSION['alert'];
+        echo "document.addEventListener('DOMContentLoaded', function() {
+                showToast('" . addslashes($alert['message']) . "', '" . ($alert['type'] === 'success' ? 'success' : 'error') . "');
+            });";
+        unset($_SESSION['alert']);
+    }
+    ?>
+</script>
