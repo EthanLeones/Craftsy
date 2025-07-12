@@ -1,5 +1,8 @@
 <?php
 require_once 'includes/session.php';
+
+$current_page = basename($_SERVER['PHP_SELF']);
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -62,10 +65,10 @@ require_once 'includes/session.php';
                     </a>
                 </div>
                 <nav class="nav-links">
-                    <a href="index.php" class="nav-link">Home</a>
-                    <a href="shop.php" class="nav-link">Shop</a>
-                    <a href="about.php" class="nav-link">About</a>
-                    <a href="contact.php" class="nav-link">Contact</a>
+                    <a href="index.php" class="nav-link <?php echo ($current_page == 'index.php') ? 'active' : ''; ?>">HOME</a>
+                    <a href="shop.php" class="nav-link <?php echo ($current_page == 'shop.php') ? 'active' : ''; ?>">SHOP</a>
+                    <a href="about.php" class="nav-link <?php echo ($current_page == 'about.php') ? 'active' : ''; ?>">ABOUT</a>
+                    <a href="contact.php" class="nav-link <?php echo ($current_page == 'contact.php') ? 'active' : ''; ?>">CONTACT</a>
                 </nav>
             </div>
             <div class="header-right">

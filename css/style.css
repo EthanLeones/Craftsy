@@ -1,4 +1,5 @@
 /* Global Styles */
+
 body {
     font-family: "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
     margin: 0;
@@ -8,190 +9,41 @@ body {
     min-height: 100vh;
 }
 
+
 /* Admin Body Specific Styles */
+
 body.admin-page {
-     padding-left: 250px; /* Add padding to the body equal to sidebar width (250px) */
+    padding-left: 250px;
+    /* Add padding to the body equal to sidebar width (250px) */
 }
+
 
 /* Admin Layout - Removed all admin layout styles from here */
+
+
 /*
-.admin-wrapper {
-    width: 100%;
-}
-
-.admin-sidebar {
-    width: 220px;
-    background-color: #231942;
-    color: white;
-    padding: 20px 15px;
-    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
-    display: flex;
-    flex-direction: column;
-    position: fixed;
-    top: 0;
-    left: 0;
-    height: 100vh;
-    overflow-y: auto;
-    z-index: 999;
-}
-
-.admin-sidebar .sidebar-header {
-    text-align: center;
-    margin-bottom: 30px;
-    padding-bottom: 15px;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
-    color: #B8A8F2;
-    font-size: 1.4rem;
-    font-weight: 600;
-}
-
-.admin-sidebar .sidebar-header h3 {
-    color: inherit;
-    margin: 0;
-    font-size: 1em;
-}
-
-.admin-sidebar .sidebar-menu {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-    flex-grow: 1;
-}
-
-.admin-sidebar .sidebar-menu li {
-    margin-bottom: 8px;
-}
-
-.admin-sidebar .sidebar-menu a {
-    color: rgba(255, 255, 255, 0.85);
-    text-decoration: none;
-    display: flex;
-    align-items: center;
-    padding: 10px 15px;
-    border-radius: 4px;
-    transition: background-color 0.3s ease, color 0.3s ease;
-    font-weight: 400;
-}
-
-.admin-sidebar .sidebar-menu a:hover {
-    background-color: #5E548E;
-    color: white;
-}
-
-.admin-sidebar .sidebar-menu a i {
-    margin-right: 10px;
-    width: 20px;
-    text-align: center;
-}
-
-.admin-sidebar .sidebar-footer {
-    margin-top: 30px;
-    padding-top: 15px;
-    border-top: 1px solid rgba(255, 255, 255, 0.2);
-    text-align: center;
-}
-
-.admin-sidebar .sidebar-footer a {
-     color: rgba(255, 255, 255, 0.85);
-     text-decoration: none;
-     display: block;
-     padding: 10px 15px;
-     border-radius: 4px;
-     transition: background-color 0.3s ease, color 0.3s ease;
-     font-weight: 400;
-}
-
-.admin-sidebar .sidebar-footer a:hover {
-    background-color: #5E548E;
-     color: white;
-}
-
-.admin-sidebar .sidebar-footer i {
-    margin-right: 10px;
-}
-
-.admin-page-content {
-    margin-left: 220px;
-    margin-top: 80px;
-    padding: 20px;
-    flex-grow: 1;
-    overflow-y: auto;
-    width: calc(100% - 220px);
-}
-*/
-
-/* Media query for smaller screens for sidebar - Removed this media query */
-/*
-@media (max-width: 992px) {
-    body.admin-page {
-        padding-left: 0;
-    }
-
-    .admin-wrapper {
-        flex-direction: column;
-        margin-top: 0;
-        min-height: auto;
-    }
-
-    .admin-sidebar {
-        width: 100%;
-        height: auto;
-        position: static;
-        overflow-y: visible;
-        padding: 10px;
-         flex-direction: column;
-         z-index: auto;
-    }
-
-    .admin-sidebar .sidebar-header,
-    .admin-sidebar .sidebar-footer {
-        display: block;
-         text-align: left;
-    }
-
-     .admin-sidebar .sidebar-menu {
-         flex-direction: row;
-         justify-content: center;
-         gap: 15px;
-         flex-wrap: wrap;
-         margin-top: 10px;
-     }
-
-     .admin-sidebar .sidebar-menu li {
-         margin-bottom: 0;
-     }
-
-    .admin-sidebar .sidebar-menu a {
-         padding: 8px 15px;
-    }
-
-    .admin-page-content {
-        margin-left: 0;
-        margin-top: 0;
-        padding: 10px;
-        width: 100%;
-    }
-}
-*/
 
 /* Header Styles */
+
 .header {
-    background-color: #231942;
+    background-color: #ffffff;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
     position: sticky;
     top: 0;
-    z-index: 1000; /* Ensure header is on top */
+    z-index: 1000;
+    /* Ensure header is on top */
     border-bottom: none;
 }
 
 .header-container {
-    max-width: 1200px;
+    max-width: 1600px;
     margin: 0 auto;
     padding: 0.5rem 1.5rem;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    height: 80px; /* Increased height */
+    height: 100px;
+    /* Increased height */
 }
 
 .header-left {
@@ -205,7 +57,8 @@ body.admin-page {
 }
 
 .logo-img {
-    height: 60px; /* Larger logo */
+    height: 145px;
+    /* Larger logo */
     width: auto;
     transition: transform 0.3s ease;
     vertical-align: middle;
@@ -220,14 +73,16 @@ body.admin-page {
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 2.5rem; /* More space between links */
+    gap: 4rem;
 }
 
 .nav-link {
-    color: white;
+    color: #231942;
     text-decoration: none;
-    font-weight: 600; /* Bolder */
-    font-size: 1.25rem; /* Larger font */
+    font-weight: 400;
+    /* Bolder */
+    font-size: 2rem;
+    /* Larger font */
     padding: 0 0.5rem;
     position: relative;
     transition: color 0.3s ease, font-size 0.3s;
@@ -238,8 +93,8 @@ body.admin-page {
 }
 
 .nav-link:hover {
-    color: #B8A8F2;
-    font-size: 1.3rem;
+    color: #231942;
+    font-size: 2.2rem;
 }
 
 .nav-link::after {
@@ -249,11 +104,15 @@ body.admin-page {
     left: 0;
     width: 0;
     height: 2px;
-    background-color: #B8A8F2;
+    background-color: #231942;
     transition: width 0.3s ease;
 }
 
 .nav-link:hover::after {
+    width: 100%;
+}
+
+.nav-link.active::after {
     width: 100%;
 }
 
@@ -277,9 +136,10 @@ body.admin-page {
 
 .auth-link,
 .auth-link.register {
-    background-color: #5E548E;
-    color: white;
-    padding: 0.5rem 1.2rem;
+    background-color: white;
+    border: 1px solid black;
+    color: black;
+    padding: 0.4rem 1rem;
     border-radius: 4px;
     font-weight: 400;
     font-size: 0.9rem;
@@ -386,51 +246,43 @@ body.admin-page {
     color: #5E548E;
 }
 
+
 /* Responsive Header */
+
 @media (max-width: 768px) {
     .header-container {
         padding: 0.5rem 1rem;
         height: 50px;
     }
-
     .header-left {
         gap: 1rem;
     }
-
     .nav-links {
         display: none;
     }
-
     .logo-img {
         height: 30px;
     }
-
     .header-right {
         gap: 1rem;
     }
-
     .auth-links {
         gap: 0.5rem;
     }
-
     .auth-link {
         padding: 0.3rem 0.6rem;
         font-size: 0.8rem;
     }
-
     .auth-link.register {
         padding: 0.3rem 0.8rem;
     }
-
     .header-icons {
         gap: 0.5rem;
     }
-
     .icon-img {
         width: 18px;
         height: 18px;
     }
-
     .cart-count {
         font-size: 0.6rem;
         width: 14px;
@@ -438,14 +290,15 @@ body.admin-page {
         top: -1px;
         right: -1px;
     }
-
     .profile-dropdown .dropdown-content {
         min-width: 140px;
         font-size: 0.85rem;
     }
 }
 
+
 /* Container and Layout */
+
 .container {
     width: 90%;
     margin: 40px auto;
@@ -457,7 +310,9 @@ body.admin-page {
     padding-bottom: 120px;
 }
 
+
 /* Footer Styles */
+
 .footer {
     background-color: #231942;
     color: white;
@@ -496,14 +351,18 @@ body.admin-page {
     margin-top: 20px;
 }
 
+
 /* Page Title */
+
 .page-title {
     text-align: center;
     color: #5E548E;
     margin-bottom: 40px;
 }
 
+
 /* Form Styles */
+
 .form-group {
     margin-bottom: 12px;
 }
@@ -531,7 +390,9 @@ input[type="number"] {
     transition: border-color 0.3s ease, box-shadow 0.3s ease;
 }
 
+
 /* Focus state */
+
 .form-group input:focus,
 .form-group textarea:focus,
 .form-group select:focus,
@@ -558,7 +419,9 @@ button:hover {
     background-color: #231942;
 }
 
+
 /* Shop Page Styles */
+
 .shop-content {
     display: flex;
     gap: 20px;
@@ -592,7 +455,9 @@ button:hover {
     height: auto;
 }
 
+
 /* About Page Styles */
+
 .about-section {
     margin-bottom: 40px;
 }
@@ -617,7 +482,9 @@ button:hover {
     border-radius: 4px;
 }
 
+
 /* Contact Page Styles */
+
 .contact-container {
     display: flex;
     gap: 40px;
@@ -628,7 +495,9 @@ button:hover {
     flex: 1;
 }
 
+
 /* FAQ Page Styles */
+
 .faq-item {
     margin-bottom: 20px;
     padding: 20px;
@@ -637,7 +506,9 @@ button:hover {
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
+
 /* Login/Register Styles */
+
 .login-container,
 .register-container,
 .forgot-password-container {
@@ -645,21 +516,30 @@ button:hover {
     margin: 0 auto;
     padding: 20px;
     background-color: white;
-    border-radius: 10px; /* Slightly more rounded */
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); /* More pronounced shadow */
-    border: 1px solid transparent; /* Add a border to transition */
+    border-radius: 10px;
+    /* Slightly more rounded */
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    /* More pronounced shadow */
+    border: 1px solid transparent;
+    /* Add a border to transition */
     transition: border-color 0.3s ease, box-shadow 0.3s ease;
 }
 
+
 /* Highlight the container when any input inside is focused */
+
 .login-container:focus-within,
 .register-container:focus-within,
 .forgot-password-container:focus-within {
-    border-color: #5e548e; /* Highlight color */
-    box-shadow: 0 4px 15px rgba(94, 84, 142, 0.4); /* Highlight shadow */
+    border-color: #5e548e;
+    /* Highlight color */
+    box-shadow: 0 4px 15px rgba(94, 84, 142, 0.4);
+    /* Highlight shadow */
 }
 
+
 /* Hero Section Styles */
+
 .hero-section {
     text-align: center;
     padding: 60px 20px;
@@ -688,7 +568,9 @@ button:hover {
     color: white;
 }
 
+
 /* Features Section */
+
 .features {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
@@ -704,7 +586,9 @@ button:hover {
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
+
 /* Newsletter Section */
+
 .stay-updated {
     text-align: center;
     padding: 40px 20px;
@@ -733,41 +617,39 @@ button:hover {
     background-color: #231942;
 }
 
+
 /* Responsive Design */
+
 @media (max-width: 768px) {
     .footer-col {
         width: 100%;
         margin-bottom: 20px;
     }
-
     .about-content,
     .contact-container {
         flex-direction: column;
     }
-
     .shop-content {
         flex-direction: column;
     }
-
     .sidebar {
         width: 100%;
     }
-
     .header {
         flex-direction: column;
         padding: 10px;
     }
-
     .nav-links {
         margin: 10px 0;
     }
-
     .header-icons {
         margin-top: 10px;
     }
 }
 
+
 /* Profile Dropdown Styles */
+
 .profile-dropdown {
     position: relative;
     display: inline-block;
@@ -775,9 +657,9 @@ button:hover {
 }
 
 .profile-dropdown .profile-icon-img {
-     cursor: pointer;
-     height: 32px;
-     vertical-align: middle;
+    cursor: pointer;
+    height: 32px;
+    vertical-align: middle;
 }
 
 .profile-dropdown .dropdown-content {
@@ -785,7 +667,7 @@ button:hover {
     position: absolute;
     background-color: #f9f9f9;
     min-width: 120px;
-    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+    box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
     z-index: 1;
     right: 0;
     border-radius: 4px;
@@ -808,12 +690,18 @@ button:hover {
     display: block;
 }
 
+
 /* Cart Page Styles */
-.cart-container, .checkout-container, .order-confirmation-container, .profile-container, .orders-container {
+
+.cart-container,
+.checkout-container,
+.order-confirmation-container,
+.profile-container,
+.orders-container {
     background-color: white;
     padding: 30px;
     border-radius: 8px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
     margin-bottom: 40px;
 }
 
@@ -873,7 +761,9 @@ button:hover {
     margin-left: 10px;
 }
 
+
 /* Checkout Page Styles */
+
 .checkout-container {
     display: flex;
     gap: 40px;
@@ -938,7 +828,7 @@ button:hover {
 }
 
 .summary-items .summary-item .item-price {
-     font-weight: bold;
+    font-weight: bold;
 }
 
 .summary-total {
@@ -953,7 +843,9 @@ button:hover {
     text-align: right;
 }
 
+
 /* Order Confirmation Page Styles */
+
 .confirmation-message {
     text-align: center;
     margin-bottom: 40px;
@@ -988,9 +880,9 @@ button:hover {
 }
 
 .shipping-details pre {
-     margin: 5px 0;
-     white-space: pre-wrap;
-     font-family: inherit;
+    margin: 5px 0;
+    white-space: pre-wrap;
+    font-family: inherit;
 }
 
 .confirmation-actions {
@@ -998,14 +890,18 @@ button:hover {
     text-align: center;
 }
 
+
 /* Profile Page Styles */
+
 .profile-container h3 {
     margin-top: 30px;
     margin-bottom: 15px;
     color: #5E548E;
 }
 
+
 /* Orders Page Styles */
+
 .orders-container table {
     width: 100%;
     border-collapse: collapse;
@@ -1026,7 +922,9 @@ button:hover {
     background-color: #f9f9f9;
 }
 
+
 /* Order Details Page Styles */
+
 .order-details-container .order-summary-section,
 .order-details-container .shipping-details-section,
 .order-details-container .order-items-section {
@@ -1089,4 +987,4 @@ button:hover {
 .order-details-container .back-link {
     text-align: center;
     margin-top: 30px;
-} 
+}

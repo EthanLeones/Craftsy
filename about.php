@@ -1,6 +1,5 @@
 <?php $page_title = 'About Us'; ?>
 <?php include 'header.php'; ?>
-/* asdaskdjad */ 
 <style>
     .about-content {
         display: flex;
