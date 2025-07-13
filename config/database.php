@@ -1,10 +1,10 @@
 <?php
-// Database configuration
-define('DB_HOST', 'localhost'); // Or the host provided by your hosting
+
+define('DB_HOST', 'localhost'); 
 define('DB_USER', 'root');
 define('DB_PASS', '');
 define('DB_NAME', 's22101184_craftsy');
-// Create database connection
+
 function getDBConnection() {
     try {
         $conn = new PDO(
@@ -24,13 +24,12 @@ function getDBConnection() {
     }
 }
 
-// Optional: Function to initialize database tables if they don't exist
-// You can run your database.sql file separately instead if you prefer.
+
 function initializeDatabase() {
     try {
         $conn = getDBConnection();
         
-        // Example: Create users table if not exists
+
         $conn->exec("CREATE TABLE IF NOT EXISTS users (
             id INT PRIMARY KEY AUTO_INCREMENT,
             username VARCHAR(100) UNIQUE NOT NULL,
@@ -43,9 +42,7 @@ function initializeDatabase() {
             UNIQUE KEY unique_email (email)
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci");
         
-        // Add other CREATE TABLE IF NOT EXISTS statements here for products, orders, etc.
-        // based on your database.sql file
-        
+
         return true;
     } catch (PDOException $e) {
         error_log("Database initialization error: " . $e->getMessage());

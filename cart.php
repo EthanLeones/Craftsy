@@ -13,7 +13,7 @@ $user_id = getCurrentUserId();
 if ($user_id) {
     try {
         $conn = getDBConnection();
-        $stmt = $conn->prepare("SELECT c.*, p.name, p.price, p.image_url, p.description FROM cart c JOIN products p ON c.product_id = p.id WHERE c.user_id = ?");
+        $stmt = $conn->prepare("SELECT c.*, p.name, p.price, p.image_url, p.description, p.stock_quantity FROM cart c JOIN products p ON c.product_id = p.id WHERE c.user_id = ?");
         $stmt->execute([$user_id]);
         $cart_items = $stmt->fetchAll(PDO::FETCH_ASSOC);
         $total_amount = array_sum(array_map(function ($item) {
@@ -445,6 +445,7 @@ if ($user_id) {
                                 <div class="item-details">
                                     <h4><?php echo htmlspecialchars($item['name']); ?></h4>
                                     <p><?php echo htmlspecialchars($item['description'] ?? 'description description'); ?></p>
+                                    <small style="color: #666; font-size: 0.75rem;">Stock: <?php echo htmlspecialchars($item['stock_quantity']); ?> available</small><br>
                                     <button class="remove-btn remove-item">Remove</button>
                                 </div>
                             </div>
@@ -459,7 +460,9 @@ if ($user_id) {
                                     class="quantity-input"
                                     value="<?php echo htmlspecialchars($item['quantity']); ?>"
                                     min="1"
-                                    data-product-id="<?php echo htmlspecialchars($item['product_id']); ?>">
+                                    max="<?php echo htmlspecialchars($item['stock_quantity']); ?>"
+                                    data-product-id="<?php echo htmlspecialchars($item['product_id']); ?>"
+                                    data-stock="<?php echo htmlspecialchars($item['stock_quantity']); ?>">
                                 <button class="quantity-btn increase-qty">+</button>
                             </div>
                         </td>
@@ -534,8 +537,15 @@ if ($user_id) {
             cartTable.addEventListener('click', function(event) {
                 if (event.target.classList.contains('increase-qty')) {
                     const quantityInput = event.target.parentNode.querySelector('.quantity-input');
-                    quantityInput.value = parseInt(quantityInput.value) + 1;
-                    updateQuantity(quantityInput);
+                    const currentValue = parseInt(quantityInput.value);
+                    const stockLimit = parseInt(quantityInput.dataset.stock);
+                    
+                    if (currentValue < stockLimit) {
+                        quantityInput.value = currentValue + 1;
+                        updateQuantity(quantityInput);
+                    } else {
+                        showToast('Cannot add more items. Only ' + stockLimit + ' available in stock.', 'error');
+                    }
                 } else if (event.target.classList.contains('decrease-qty')) {
                     const quantityInput = event.target.parentNode.querySelector('.quantity-input');
                     const newValue = Math.max(1, parseInt(quantityInput.value) - 1);
@@ -558,8 +568,16 @@ if ($user_id) {
             const itemElement = quantityInput.closest('.cart-item-row');
             const productId = itemElement.dataset.itemId;
             const newQuantity = parseInt(quantityInput.value);
+            const stockLimit = parseInt(quantityInput.dataset.stock);
 
             if (!isNaN(newQuantity) && newQuantity >= 1) {
+                // Check if quantity exceeds stock limit
+                if (newQuantity > stockLimit) {
+                    quantityInput.value = stockLimit;
+                    showToast('Cannot add more than ' + stockLimit + ' items. Stock limit reached.', 'error');
+                    return;
+                }
+
                 const formData = new FormData();
                 formData.append('product_id', productId);
                 formData.append('quantity', newQuantity);
