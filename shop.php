@@ -37,7 +37,6 @@ if (isset($_GET['search']) && !empty(trim($_GET['search']))) {
     $search_query = trim($_GET['search']);
     $sql .= " AND (name LIKE ? OR description LIKE ?)";
     $params[] = '%' . $search_query . '%';
-    $params[] = '%' . $search_query . '%';
 }
 
 $sql .= " ORDER BY created_at DESC";
