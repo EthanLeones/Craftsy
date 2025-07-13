@@ -290,6 +290,68 @@ if ($user_id) {
         transform: translateY(-2px);
     }
 
+    .toast-container {
+        position: fixed;
+        top: 32px;
+        right: 32px;
+        z-index: 9999;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        pointer-events: none;
+    }
+    .toast {
+        min-width: 220px;
+        max-width: 350px;
+        background: #fff;
+        color: #3f1a41;
+        border-radius: 8px;
+        box-shadow: 0 4px 16px rgba(63,26,65,0.18);
+        padding: 16px 24px;
+        font-size: 1em;
+        font-weight: 500;
+        opacity: 0;
+        transform: translateY(-20px);
+        transition: opacity 0.3s, transform 0.3s;
+        pointer-events: auto;
+        border-left: 6px solid #be95c4;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+    .toast.success { color: white; border-left-color: #4bb543; }
+    .toast.error { border-left-color: #e74c3c; }
+    .toast.confirm { border-left-color: #f1c40f; }
+    .toast.show {
+        opacity: 1;
+        transform: translateY(0);
+    }
+    .toast .toast-actions {
+        margin-left: 18px;
+        display: flex;
+        gap: 8px;
+    }
+    .toast .toast-btn {
+        background: #be95c4;
+        color: #fff;
+        border: none;
+        border-radius: 5px;
+        padding: 6px 14px;
+        font-size: 0.95em;
+        font-weight: 500;
+        cursor: pointer;
+        transition: background 0.2s;
+    }
+    .toast .toast-btn:hover {
+        background: #3f1a41;
+    }
+    .toast .toast-btn.cancel {
+        background: #e74c3c;
+    }
+    .toast .toast-btn.cancel:hover {
+        background: #c0392b;
+    }
+
     @media (max-width: 768px) {
         .cart-page {
             padding: 30px 15px;
@@ -337,8 +399,22 @@ if ($user_id) {
             align-items: center;
             gap: 15px;
         }
+        
+        .toast-container {
+            top: 16px;
+            right: 8px;
+            left: 8px;
+            align-items: center;
+        }
+        .toast {
+            min-width: 0;
+            max-width: 98vw;
+            padding: 12px 16px;
+        }
     }
 </style>
+
+<div class="toast-container" id="toast-container"></div>
 
 <div class="cart-page">
     <h1 class="cart-title">Shopping Cart</h1>
@@ -516,41 +592,86 @@ if ($user_id) {
             }
         }
 
+        function showToast(message, type = 'success', options = {}) {
+            const container = document.getElementById('toast-container');
+            if (!container) return;
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            toast.innerHTML = `<span>${message}</span>`;
+            if (type === 'confirm' && options.onConfirm && options.onCancel) {
+                const actions = document.createElement('div');
+                actions.className = 'toast-actions';
+                const yesBtn = document.createElement('button');
+                yesBtn.className = 'toast-btn';
+                yesBtn.textContent = 'Yes';
+                yesBtn.onclick = () => {
+                    toast.classList.remove('show');
+                    setTimeout(() => container.removeChild(toast), 300);
+                    options.onConfirm();
+                };
+                const cancelBtn = document.createElement('button');
+                cancelBtn.className = 'toast-btn cancel';
+                cancelBtn.textContent = 'Cancel';
+                cancelBtn.onclick = () => {
+                    toast.classList.remove('show');
+                    setTimeout(() => container.removeChild(toast), 300);
+                    options.onCancel();
+                };
+                actions.appendChild(yesBtn);
+                actions.appendChild(cancelBtn);
+                toast.appendChild(actions);
+            }
+            container.appendChild(toast);
+            setTimeout(() => toast.classList.add('show'), 10);
+            if (type !== 'confirm') {
+                setTimeout(() => {
+                    toast.classList.remove('show');
+                    setTimeout(() => container.removeChild(toast), 300);
+                }, 3000);
+            }
+        }
+
         function removeItem(removeButton) {
             const itemElement = removeButton.closest('.cart-item-row');
             const productId = itemElement.dataset.itemId;
 
-            if (confirm('Are you sure you want to remove this item from your cart?')) {
-                const formData = new FormData();
-                formData.append('product_id', productId);
+            showToast('Are you sure you want to remove this item from your cart?', 'confirm', {
+                onConfirm: function() {
+                    const formData = new FormData();
+                    formData.append('product_id', productId);
 
-                fetch('remove_from_cart.php', {
-                        method: 'POST',
-                        body: formData
-                    })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.success) {
-                            itemElement.remove();
-                            updateCartTotals();
-                            const cartCountSpan = document.querySelector('.header-icons .cart-count');
-                            if (cartCountSpan && data.cart_count !== undefined) {
-                                cartCountSpan.textContent = data.cart_count;
-                            }
+                    fetch('remove_from_cart.php', {
+                            method: 'POST',
+                            body: formData
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.success) {
+                                itemElement.remove();
+                                updateCartTotals();
+                                const cartCountSpan = document.querySelector('.header-icons .cart-count');
+                                if (cartCountSpan && data.cart_count !== undefined) {
+                                    cartCountSpan.textContent = data.cart_count;
+                                }
 
-                            // Check if cart is empty and reload if needed
-                            if (document.querySelectorAll('.cart-item-row').length === 0) {
-                                location.reload();
+                                // Check if cart is empty and reload if needed
+                                if (document.querySelectorAll('.cart-item-row').length === 0) {
+                                    location.reload();
+                                }
+                                showToast('Item removed from cart.', 'success');
+                            } else {
+                                showToast('Failed to remove item: ' + data.message, 'error');
                             }
-                        } else {
-                            showToast('Failed to remove item: ' + data.message, 'error');
-                        }
-                    })
-                    .catch(error => {
-                        console.error('Error:', error);
-                        showToast('An error occurred while removing the item.', 'error');
-                    });
-            }
+                        })
+                        .catch(error => {
+                            console.error('Error:', error);
+                            showToast('An error occurred while removing the item.', 'error');
+                        });
+                },
+                onCancel: function() {
+                    // Do nothing, just close the toast
+                }
+            });
         }
 
         updateCartTotals();
