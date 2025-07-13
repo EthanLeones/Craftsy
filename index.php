@@ -156,11 +156,11 @@ require_once 'includes/session.php';
     }
 
     .newsletter h1 {
-        font-size: 2.2rem;
+        font-size: 3rem;
         font-weight: 300;
         margin-bottom: 15px;
         text-transform: uppercase;
-        letter-spacing: 4px;
+        letter-spacing: 5px;
     }
 
     .newsletter p {
@@ -284,7 +284,8 @@ require_once 'includes/session.php';
         }
 
         .newsletter h1 {
-            font-size: 1.8rem;
+        font-size: 3rem;
+        font-weight: 300;
             letter-spacing: 3px;
         }
     }
@@ -335,7 +336,8 @@ require_once 'includes/session.php';
         }
 
         .newsletter h1 {
-            font-size: 1.5rem;
+        font-size: 3rem;
+        font-weight: 300;
             letter-spacing: 2px;
         }
 
@@ -367,7 +369,8 @@ require_once 'includes/session.php';
         }
 
         .newsletter h1 {
-            font-size: 1.3rem;
+        font-size: 3rem;
+        font-weight: 300;
             letter-spacing: 1px;
         }
 
@@ -413,12 +416,7 @@ require_once 'includes/session.php';
     
     <div class="section section3">
         <div class="newsletter">
-            <h1>Stay Updated</h1>
-            <p>Subscribe to our newsletter for exclusive offers and updates</p>
-            <form action="subscribe_newsletter.php" method="post" class="newsletter-form">
-                <input type="email" name="email" placeholder="Enter your email address" required>
-                <button type="submit">Subscribe</button>
-            </form>
+            <h1>"Where eco-friendly meets effortlessly stylish"</h1>
         </div>
     </div>
 </div>

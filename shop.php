@@ -37,6 +37,8 @@ if (isset($_GET['search']) && !empty(trim($_GET['search']))) {
     $search_query = trim($_GET['search']);
     $sql .= " AND (name LIKE ? OR description LIKE ?)";
     $params[] = '%' . $search_query . '%';
+    $params[] = '%' . $search_query . '%';
+    
 }
 
 $sql .= " ORDER BY created_at DESC";
@@ -361,6 +363,37 @@ try {
 <?php include 'footer.php'; ?>
 
 <script>
+    function showToast(message, type = 'success') {
+        // Simple toast implementation for shop page
+        const toast = document.createElement('div');
+        toast.className = 'toast ' + type;
+        toast.textContent = message;
+        toast.style.cssText = `
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: ${type === 'success' ? '#27ae60' : '#e74c3c'};
+            color: white;
+            padding: 16px 24px;
+            border-radius: 8px;
+            z-index: 10001;
+            transition: all 0.3s ease;
+            transform: translateX(100%);
+        `;
+        document.body.appendChild(toast);
+        
+        // Show toast
+        setTimeout(() => {
+            toast.style.transform = 'translateX(0)';
+        }, 100);
+        
+        // Hide and remove toast
+        setTimeout(() => {
+            toast.style.transform = 'translateX(100%)';
+            setTimeout(() => document.body.removeChild(toast), 300);
+        }, 3000);
+    }
+
     <?php
     // Check for session alert message and display as toast
     if (isset($_SESSION['alert'])) {
