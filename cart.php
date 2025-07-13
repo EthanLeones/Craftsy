@@ -189,20 +189,19 @@ if ($user_id) {
         display: flex;
         align-items: center;
         justify-content: center;
-        transition: all 0.2s;
-    }
-
-    .quantity-btn:first-child {
-        border-left: none;
-    }
-
-    .quantity-btn:last-child {
-        border-right: none;
     }
 
     .quantity-btn:hover {
-        background: #3f1a41;
-        color: #ffffff;
+        background: #f1f3f4;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }   
+
+    .quantity-btn:first-child {
+        border-right: none;
+    }
+
+    .quantity-btn:last-child {
+        border-left: none;
     }
 
     .remove-btn {
@@ -216,13 +215,14 @@ if ($user_id) {
         text-transform: uppercase;
         letter-spacing: 0.5px;
         text-decoration: underline;
-        transition: color 0.2s;
     }
 
     .remove-btn:hover {
         color: #c0392b;
-        background-color: transparent;
+        background-color: white;
+        box-shadow: none;
     }
+
 
     .cart-footer {
         display: flex;

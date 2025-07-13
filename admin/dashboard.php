@@ -1,26 +1,18 @@
 <?php
 $page_title = 'Dashboard';
 include 'includes/admin_header.php';
-
 require_once '../config/database.php';
-
 $today_sales = 0;
 $new_orders_count = 0;
 $inquiries_count = 0;
 $pending_orders = [];
 $low_stock_products = [];
 $error_message = null;
-
 $low_stock_threshold = 10;
-
 try {
     $conn = getDBConnection();
-
-    // Today's date range
     $today_start = date('Y-m-d 00:00:00');
     $today_end = date('Y-m-d 23:59:59');
-
-    // Today's sales
     $stmt_today_sales = $conn->prepare("
         SELECT SUM(total_amount) 
         FROM orders 
@@ -29,8 +21,6 @@ try {
     ");
     $stmt_today_sales->execute([$today_start, $today_end]);
     $today_sales = $stmt_today_sales->fetchColumn() ?? 0;
-
-    // New orders today
     $stmt_new_orders = $conn->prepare("
         SELECT COUNT(*) 
         FROM orders 
@@ -39,13 +29,9 @@ try {
     ");
     $stmt_new_orders->execute([$today_start, $today_end]);
     $new_orders_count = $stmt_new_orders->fetchColumn() ?? 0;
-
-    // Total inquiries
     $stmt_inquiries_count = $conn->prepare("SELECT COUNT(*) FROM inquiry_threads");
     $stmt_inquiries_count->execute();
     $inquiries_count = $stmt_inquiries_count->fetchColumn() ?? 0;
-
-    // Pending orders today
     $stmt_pending_orders = $conn->prepare("
         SELECT o.id, o.order_date, o.total_amount, o.status, u.username, COUNT(oi.id) AS num_items 
         FROM orders o 
@@ -59,13 +45,9 @@ try {
     ");
     $stmt_pending_orders->execute([$today_start, $today_end]);
     $pending_orders = $stmt_pending_orders->fetchAll(PDO::FETCH_ASSOC);
-
-    // Pagination setup for low stock products
     $low_stock_page = isset($_GET['low_stock_page']) && is_numeric($_GET['low_stock_page']) ? (int)$_GET['low_stock_page'] : 1;
     $low_stock_limit = 5;
     $low_stock_offset = ($low_stock_page - 1) * $low_stock_limit;
-
-    // Count total low stock products (active only)
     $stmt_total_low_stock = $conn->prepare("
         SELECT COUNT(*) 
         FROM products 
@@ -76,8 +58,6 @@ try {
     $stmt_total_low_stock->execute([$low_stock_threshold]);
     $total_low_stock = $stmt_total_low_stock->fetchColumn();
     $total_low_stock_pages = ceil($total_low_stock / $low_stock_limit);
-
-    // Fetch paginated low stock products
     $stmt_low_stock_products = $conn->prepare("
         SELECT id, name, stock_quantity, image_url 
         FROM products 
@@ -92,19 +72,18 @@ try {
     $stmt_low_stock_products->bindValue(':offset', $low_stock_offset, PDO::PARAM_INT);
     $stmt_low_stock_products->execute();
     $low_stock_products = $stmt_low_stock_products->fetchAll(PDO::FETCH_ASSOC);
-
 } catch (PDOException $e) {
     error_log("Error fetching dashboard data: " . $e->getMessage());
     $error_message = "Unable to load dashboard data.";
 }
 ?>
-
 <div class="admin-wrapper">
+    <button class="mobile-menu-toggle" onclick="toggleMobileMenu()">
+        <i class="fas fa-bars"></i>
+    </button>
     <?php include 'includes/admin_sidebar.php'; ?>
-
     <div class="admin-page-content">
         <h1 class="page-title">Dashboard</h1>
-
         <div class="kpi-cards">
             <div class="kpi-card">
                 <div class="card-icon"><i class="fas fa-peso-sign"></i></div>
@@ -113,7 +92,6 @@ try {
                     <div class="card-label">Today's Sales</div>
                 </div>
             </div>
-
             <div class="kpi-card">
                 <div class="card-icon"><i class="fas fa-shopping-cart"></i></div>
                 <div class="card-details">
@@ -121,7 +99,6 @@ try {
                     <div class="card-label">New Orders</div>
                 </div>
             </div>
-
             <div class="kpi-card">
                  <div class="card-icon"><i class="fas fa-envelope"></i></div>
                  <div class="card-details">
@@ -130,132 +107,180 @@ try {
                  </div>
              </div>
         </div>
-
         <div class="admin-section">
-            <h2>Pending Orders</h2>
-            <div class="admin-table-container">
-                <table class="admin-table">
-                    <thead>
-                        <tr>
-                            <th>Order #</th>
-                            <th>Username</th>
-                            <th># Items</th>
-                            <th>Total</th>
-                            <th>Status</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <?php if (isset($error_message)): ?>
-                             <tr>
-                                 <td colspan="6" style="text-align: center; color: red;"><?php echo $error_message; ?></td>
-                             </tr>
-                        <?php elseif (empty($pending_orders)): ?>
-                            <tr>
-                                <td colspan="6" style="text-align: center;">No pending orders.</td>
-                            </tr>
-                        <?php else: ?>
-                            <?php foreach ($pending_orders as $order): ?>
-                                <tr>
-                                    <td><?php echo htmlspecialchars($order['id']); ?></td>
-                                    <td><?php echo htmlspecialchars($order['username']); ?></td>
-                                    <td><?php echo htmlspecialchars($order['num_items'] ?? 0); ?></td>
-                                    <td>P<?php echo htmlspecialchars(number_format($order['total_amount'], 2)); ?></td>
-                                    <td><?php echo htmlspecialchars($order['status']); ?></td>
-                                    <td>
-                                        <a href="orders.php?view_order_id=<?php echo htmlspecialchars($order['id']); ?>" class="button small secondary">View</a>
-                                    </td>
-                                </tr>
-                            <?php endforeach; ?>
+            <h2>Today's Overview</h2>
+            <div class="modern-dashboard-grid">
+                <div class="dashboard-section">
+                    <h3>Pending Orders</h3>
+                    <?php if (isset($error_message)): ?>
+                        <div class="empty-state" style="color: #e74c3c;">
+                            <?php echo $error_message; ?>
+                        </div>
+                    <?php elseif (empty($pending_orders)): ?>
+                        <div class="empty-state">
+                            No pending orders today.
+                        </div>
+                    <?php else: ?>
+                        <?php foreach ($pending_orders as $order): ?>
+                            <div class="order-item-card">
+                                <div class="order-item-header">
+                                    <span class="order-id">Order #<?php echo htmlspecialchars($order['id']); ?></span>
+                                    <span class="order-amount">P<?php echo htmlspecialchars(number_format($order['total_amount'], 2)); ?></span>
+                                </div>
+                                <div class="order-details">
+                                    <strong><?php echo htmlspecialchars($order['username']); ?></strong> • 
+                                    <?php echo htmlspecialchars($order['num_items'] ?? 0); ?> items • 
+                                    <?php echo htmlspecialchars(date('g:i A', strtotime($order['order_date']))); ?>
+                                </div>
+                                <a href="orders.php?view_order_id=<?php echo htmlspecialchars($order['id']); ?>" class="button small">View Order</a>
+                            </div>
+                        <?php endforeach; ?>
+                    <?php endif; ?>
+                </div>
+                <div class="dashboard-section">
+                    <h3>Low Stock Alert</h3>
+                    <?php if (isset($error_message)): ?>
+                        <div class="empty-state" style="color: #e74c3c;">
+                            <?php echo $error_message; ?>
+                        </div>
+                    <?php elseif (empty($low_stock_products)): ?>
+                        <div class="empty-state">
+                            All products are well stocked.
+                        </div>
+                    <?php else: ?>
+                        <?php foreach ($low_stock_products as $product): ?>
+                            <div class="product-stock-item">
+                                <img src="../<?php echo htmlspecialchars($product['image_url'] ?? 'images/placeholder.png'); ?>" 
+                                     alt="<?php echo htmlspecialchars($product['name']); ?>" 
+                                     class="stock-product-image">
+                                <div class="stock-product-info">
+                                    <div class="stock-product-name"><?php echo htmlspecialchars($product['name']); ?></div>
+                                    <div class="stock-quantity"><?php echo htmlspecialchars($product['stock_quantity']); ?> left in stock</div>
+                                </div>
+                                <a href="products.php?edit_product_id=<?php echo htmlspecialchars($product['id']); ?>" class="button small">Restock</a>
+                            </div>
+                        <?php endforeach; ?>
+                        <?php if ($total_low_stock_pages > 1): ?>
+                            <div class="pagination-container">
+                                <?php for ($i = 1; $i <= $total_low_stock_pages; $i++): ?>
+                                    <a href="?low_stock_page=<?= $i ?>" class="pagination-link <?= ($low_stock_page == $i) ? 'active' : '' ?>">
+                                        <?= $i ?>
+                                    </a>
+                                <?php endfor; ?>
+                            </div>
                         <?php endif; ?>
-                    </tbody>
-                </table>
-                
-
+                    <?php endif; ?>
+                </div>
             </div>
         </div>
-
-        <div class="admin-section">
-            <h2>Low Stock Products</h2>
-            <div class="admin-table-container">
-                <table class="admin-table">
-                    <thead>
-                        <tr>
-                            <th>Product</th>
-                            <th>Stock #</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                         <?php if (isset($error_message)): ?>
-                              <tr>
-                                  <td colspan="3" style="text-align: center; color: red;"><?php echo $error_message; ?></td>
-                              </tr>
-                         <?php elseif (empty($low_stock_products)): ?>
-                             <tr>
-                                 <td colspan="3" style="text-align: center;">No products are low in stock.</td>
-                             </tr>
-                         <?php else: ?>
-                             <?php foreach ($low_stock_products as $product): ?>
-                                 <tr>
-                                     <td>
-                                         <div class="product-info-cell">
-                                             <img src="../<?php echo htmlspecialchars($product['image_url'] ?? 'images/placeholder.png'); ?>" alt="<?php echo htmlspecialchars($product['name']); ?>" class="product-thumbnail">
-                                             <span><?php echo htmlspecialchars($product['name']); ?></span>
-                                         </div>
-                                     </td>
-                                     <td><?php echo htmlspecialchars($product['stock_quantity']); ?></td>
-                                     <td>
-                                         <a href="products.php?edit_product_id=<?php echo htmlspecialchars($product['id']); ?>" class="button small">Update Stock</a>
-                                     </td>
-                                 </tr>
-                             <?php endforeach; ?>
-                         <?php endif; ?>
-                    </tbody>
-                </table>
-                <?php if ($total_low_stock_pages > 1): ?>
-                    <div class="pagination-container">
-                        <?php for ($i = 1; $i <= $total_low_stock_pages; $i++): ?>
-                            <a href="?low_stock_page=<?= $i ?>" class="pagination-link <?= ($low_stock_page == $i) ? 'active' : '' ?>">
-                                <?= $i ?>
-                            </a>
-                        <?php endfor; ?>
-                    </div>
-                <?php endif; ?>
-            </div>
-        </div>
-
     </div> <!-- Close admin-page-content -->
 </div> <!-- Close admin-wrapper -->
-
 <?php
-// Add any necessary scripts here
 ?>
-
 <style>
-    .pagination-container {
-    text-align: center;
-    margin-top: 15px;
+/* Modern Dashboard Enhancements */
+.modern-dashboard-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 40px;
+    margin-top: 30px;
 }
-
-.pagination-link {
-    display: inline-block;
-    padding: 6px 12px;
-    margin: 2px;
+.dashboard-section {
+    background: #ffffff;
+    border-radius: 12px;
+    padding: 30px;
+    box-shadow: 0 8px 30px rgba(63, 26, 65, 0.08);
+    border: 1px solid #f0f0f0;
+}
+.dashboard-section h3 {
+    font-size: 1.2rem;
+    color: #3f1a41;
+    margin: 0 0 25px 0;
+    font-weight: 400;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid #f0f0f0;
+}
+.order-item-card {
+    background: #f8f9fa;
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 15px;
+    border-left: 4px solid #3f1a41;
+    transition: all 0.3s ease;
+}
+.order-item-card:hover {
+    transform: translateX(5px);
+    box-shadow: 0 4px 15px rgba(63, 26, 65, 0.1);
+}
+.order-item-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+.order-id {
+    font-weight: 600;
+    color: #3f1a41;
+    font-size: 0.9rem;
+}
+.order-amount {
+    font-weight: 600;
+    color: #27ae60;
+    font-size: 1rem;
+}
+.order-details {
+    font-size: 0.8rem;
+    color: #666666;
+    margin-bottom: 10px;
+}
+.product-stock-item {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    background: #f8f9fa;
+    border-radius: 8px;
+    padding: 15px;
+    margin-bottom: 15px;
+    border-left: 4px solid #e74c3c;
+    transition: all 0.3s ease;
+}
+.product-stock-item:hover {
+    transform: translateX(5px);
+    box-shadow: 0 4px 15px rgba(231, 76, 60, 0.1);
+}
+.stock-product-image {
+    width: 45px;
+    height: 45px;
+    object-fit: cover;
     border-radius: 6px;
-    background-color: #e5e7eb;
-    color: #333;
-    text-decoration: none;
-    transition: background-color 0.3s ease;
+    flex-shrink: 0;
 }
-
-.pagination-link:hover {
-    background-color: #d1d5db;
+.stock-product-info {
+    flex: 1;
 }
-
-.pagination-link.active {
-    background-color: #9f86c0;
-    color: white;
+.stock-product-name {
+    font-weight: 500;
+    color: #3f1a41;
+    font-size: 0.9rem;
+    margin-bottom: 5px;
 }
-
+.stock-quantity {
+    font-size: 0.8rem;
+    color: #e74c3c;
+    font-weight: 600;
+}
+.empty-state {
+    text-align: center;
+    padding: 40px 20px;
+    color: #666666;
+    font-style: italic;
+}
+@media (max-width: 768px) {
+    .modern-dashboard-grid {
+        grid-template-columns: 1fr;
+        gap: 30px;
+    }
+}
 </style>

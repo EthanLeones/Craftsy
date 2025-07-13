@@ -1,36 +1,26 @@
 <?php
 $page_title = 'Order Management';
 include 'includes/admin_header.php';
-
-
 require_once '../config/database.php'; 
-
 $new_orders_count = 0;
 $shipped_orders_count = 0;
 $completed_orders_count = 0;
 $orders = [];
 $error_message = null;
-
-
 try {
     $conn = getDBConnection();
-
     $stmt_new_orders = $conn->prepare("SELECT COUNT(*) FROM orders WHERE status = 'pending'");
     $stmt_new_orders->execute();
     $new_orders_count = $stmt_new_orders->fetchColumn();
-
     $stmt_shipped_orders = $conn->prepare("SELECT COUNT(*) FROM orders WHERE status = 'shipped'");
     $stmt_shipped_orders->execute();
     $shipped_orders_count = $stmt_shipped_orders->fetchColumn();
-
     $stmt_completed_orders = $conn->prepare("SELECT COUNT(*) FROM orders WHERE status = 'delivered'"); // Assuming 'delivered' means completed
     $stmt_completed_orders->execute();
     $completed_orders_count = $stmt_completed_orders->fetchColumn() ?? 0;
-
     $stmt_cancelled_orders = $conn->prepare("SELECT COUNT(*) FROM orders WHERE status = 'cancelled'");
     $stmt_cancelled_orders->execute();
     $cancelled_orders_count = $stmt_cancelled_orders->fetchColumn() ?? 0;
-
     $stmt_orders = $conn->prepare("
         SELECT o.*, u.username, COUNT(oi.id) as num_items
         FROM orders o
@@ -41,50 +31,43 @@ try {
     ");
     $stmt_orders->execute();
     $orders = $stmt_orders->fetchAll(PDO::FETCH_ASSOC);
-
 } catch (PDOException $e) {
     error_log("Error fetching order data: " . $e->getMessage());
     $error_message = "Unable to load order data.";
 }
-
 ?>
-
 <div class="admin-wrapper">
+    <button class="mobile-menu-toggle" onclick="toggleMobileMenu()">
+        <i class="fas fa-bars"></i>
+    </button>
     <?php include 'includes/admin_sidebar.php'; ?>
-
     <div class="admin-page-content">
         <h1 class="page-title">Order Management</h1>
-
         <div class="kpi-cards">
             <div class="kpi-card">
-                <div class="card-icon"><i class="fas fa-shopping-cart"></i></div>
+                <div class="card-icon"><i class="fas fa-clock"></i></div>
                 <div class="card-details">
                     <div class="card-value"><?php echo $new_orders_count; ?></div>
-                    <div class="card-label">Num of New Orders</div>
+                    <div class="card-label">Pending Orders</div>
                 </div>
             </div>
-
-
             <div class="kpi-card">
                  <div class="card-icon"><i class="fas fa-check-circle"></i></div>
                  <div class="card-details">
                      <div class="card-value"><?php echo $completed_orders_count; ?></div>
-                     <div class="card-label">Num of Completed Orders</div>
+                     <div class="card-label">Completed Orders</div>
                  </div>
              </div>
-
             <div class="kpi-card">
                 <div class="card-icon"><i class="fas fa-times-circle"></i></div>
                 <div class="card-details">
                     <div class="card-value"><?php echo $cancelled_orders_count; ?></div>
-                    <div class="card-label">Num of Cancelled Orders</div>
+                    <div class="card-label">Cancelled Orders</div>
                 </div>
-            </div>  
-             <!-- Add more KPI cards here if needed -->
+            </div>
         </div>
-
         <div class="admin-section">
-            <h2>Orders</h2>
+            <h2><i class="fas fa-clock"></i> Pending Orders</h2>
             <div class="admin-table-container">
                 <table class="admin-table">
                     <thead>
@@ -121,11 +104,12 @@ try {
                                     <td><?php echo htmlspecialchars($order['order_date']); ?></td>
                                     <td><?php echo htmlspecialchars($order['num_items']); ?></td>
                                     <td>P<?php echo htmlspecialchars(number_format($order['total_amount'], 2)); ?></td>
-                                    <td><?php echo htmlspecialchars($order['status']); ?></td>
+                                    <td><span class="status-badge status-<?php echo strtolower($order['status']); ?>"><?php echo htmlspecialchars($order['status']); ?></span></td>
                                     <td>
-                                        <button class="button small secondary view-order-button" data-id="<?php echo htmlspecialchars($order['id']); ?>">View</button>
-                                        <button class="button small edit-order-button" data-id="<?php echo htmlspecialchars($order['id']); ?>" data-status="<?php echo htmlspecialchars($order['status']); ?>">Edit</button>
-                                        
+                                        <div class="action-buttons">
+                                            <button class="button small secondary view-order-button" data-id="<?php echo htmlspecialchars($order['id']); ?>"><i class="fas fa-eye"></i> View</button>
+                                            <button class="button small edit-order-button" data-id="<?php echo htmlspecialchars($order['id']); ?>" data-status="<?php echo htmlspecialchars($order['status']); ?>"><i class="fas fa-edit"></i> Edit</button>
+                                        </div>
                                     </td>
                                 </tr>
                             <?php endforeach; ?>
@@ -134,9 +118,8 @@ try {
                 </table>
             </div>
         </div>
-
         <div class="admin-section">
-            <h2>Delivered Orders</h2>
+            <h2><i class="fas fa-check-circle"></i> Delivered Orders</h2>
             <div class="admin-table-container">
                 <table class="admin-table">
                     <thead>
@@ -168,10 +151,12 @@ try {
                                     <td><?php echo htmlspecialchars($order['order_date']); ?></td>
                                     <td><?php echo htmlspecialchars($order['num_items']); ?></td>
                                     <td>P<?php echo htmlspecialchars(number_format($order['total_amount'], 2)); ?></td>
-                                    <td><?php echo htmlspecialchars($order['status']); ?></td>
+                                    <td><span class="status-badge status-<?php echo strtolower($order['status']); ?>"><?php echo htmlspecialchars($order['status']); ?></span></td>
                                     <td>
-                                        <button class="button small secondary view-order-button" data-id="<?php echo htmlspecialchars($order['id']); ?>">View</button>
-                                        <button class="button small edit-order-button" data-id="<?php echo htmlspecialchars($order['id']); ?>" data-status="<?php echo htmlspecialchars($order['status']); ?>">Edit</button>
+                                        <div class="action-buttons">
+                                            <button class="button small secondary view-order-button" data-id="<?php echo htmlspecialchars($order['id']); ?>"><i class="fas fa-eye"></i> View</button>
+                                            <button class="button small edit-order-button" data-id="<?php echo htmlspecialchars($order['id']); ?>" data-status="<?php echo htmlspecialchars($order['status']); ?>"><i class="fas fa-edit"></i> Edit</button>
+                                        </div>
                                     </td>
                                 </tr>
                                 <?php endif; ?>
@@ -181,10 +166,8 @@ try {
                 </table>
             </div>
         </div>
-
-
         <div class="admin-section">
-            <h2>Cancelled Orders</h2>
+            <h2><i class="fas fa-times-circle"></i> Cancelled Orders</h2>
             <div class="admin-table-container">
                 <table class="admin-table">
                     <thead>
@@ -219,10 +202,12 @@ try {
                                     <td><?php echo htmlspecialchars($order['order_date']); ?></td>
                                     <td><?php echo htmlspecialchars($order['num_items']); ?></td>
                                     <td>P<?php echo htmlspecialchars(number_format($order['total_amount'], 2)); ?></td>
-                                    <td><?php echo htmlspecialchars($order['status']); ?></td>
+                                    <td><span class="status-badge status-<?php echo strtolower($order['status']); ?>"><?php echo htmlspecialchars($order['status']); ?></span></td>
                                     <td>
-                                        <button class="button small secondary view-order-button" data-id="<?php echo htmlspecialchars($order['id']); ?>">View</button>
-                                        <button class="button small edit-order-button" data-id="<?php echo htmlspecialchars($order['id']); ?>" data-status="<?php echo htmlspecialchars($order['status']); ?>">Edit</button>
+                                        <div class="action-buttons">
+                                            <button class="button small secondary view-order-button" data-id="<?php echo htmlspecialchars($order['id']); ?>"><i class="fas fa-eye"></i> View</button>
+                                            <button class="button small edit-order-button" data-id="<?php echo htmlspecialchars($order['id']); ?>" data-status="<?php echo htmlspecialchars($order['status']); ?>"><i class="fas fa-edit"></i> Edit</button>
+                                        </div>
                                     </td>
                                 </tr>
                                 <?php endif; ?>
@@ -232,8 +217,6 @@ try {
                 </table>
             </div>
         </div>
-
-
         <div id="view-order-modal" class="modal" style="display:none;">
             <div class="modal-content">
                 <span class="close-button">&times;</span>
@@ -244,8 +227,6 @@ try {
                 </div>
             </div>
         </div>
-
-
         <div id="edit-order-modal" class="modal" style="display:none;">
              <div class="modal-content">
                  <span class="close-button">&times;</span>
@@ -266,13 +247,10 @@ try {
                  </form>
              </div>
          </div>
-
     </div> <!-- Close admin-page-content -->
 </div> <!-- Close admin-wrapper -->
-
 <?php
 ?>
-
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     const viewOrderModal = document.getElementById('view-order-modal');
@@ -285,15 +263,12 @@ document.addEventListener('DOMContentLoaded', function() {
     const editOrderIdInput = document.getElementById('edit_order_id');
     const editOrderForm = document.getElementById('edit-order-form');
     const editSaveButton = document.querySelector('.button.primary');
-
     viewOrderButtons.forEach(button => {
         button.addEventListener('click', function() {
             const orderId = this.getAttribute('data-id');
             console.log('View order details for ID:', orderId);
-
             orderDetailsContent.innerHTML = '<p style="text-align: center;">Loading order details for ID: ' + orderId + '...</p>';
             viewOrderModal.style.display = 'block';
-
             fetch('get_order_details.php?id=' + orderId)
                 .then(response => response.text()) 
                 .then(html => {
@@ -305,30 +280,20 @@ document.addEventListener('DOMContentLoaded', function() {
                 });
         });
     });
-
     editOrderButtons.forEach(button => {
         button.addEventListener('click', function() {
             const orderId = this.getAttribute('data-id');
             const currentStatus = this.getAttribute('data-status');
             console.log('Edit order status for ID:', orderId, 'Current status:', currentStatus);
-
             editOrderIdInput.value = orderId;
-
             editOrderStatusSelect.value = currentStatus;
-
             editOrderModal.style.display = 'block';
         });
     });
-
-
-
     editOrderForm.addEventListener('submit', function(event) {
         event.preventDefault(); 
-
         editSaveButton.disabled = true;
-
         const formData = new FormData(this);
-
         fetch(this.action, {
             method: 'POST',
             body: formData
@@ -349,19 +314,16 @@ document.addEventListener('DOMContentLoaded', function() {
         })
         .catch(error => {
             console.error('AJAX Error updating order:', error);
-
         })
          .finally(() => {
             editSaveButton.disabled = false;
          });
     });
-
     closeButtons.forEach(button => {
         button.addEventListener('click', function() {
             const modal = button.closest('.modal');
             if (modal) {
                 modal.style.display = 'none';
-
                 if (modal.id === 'view-order-modal') {
                     orderDetailsContent.innerHTML = '<p style="text-align: center;">Loading order details...</p>'; // Reset view modal content
                 } else if (modal.id === 'edit-order-modal') {
@@ -370,8 +332,6 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     });
-
-
     window.addEventListener('click', function(event) {
         if (event.target == viewOrderModal) {
             viewOrderModal.style.display = 'none';
@@ -382,7 +342,5 @@ document.addEventListener('DOMContentLoaded', function() {
             document.getElementById('edit-order-form').reset(); // Reset edit form
         }
     });
-
 });
-
 </script> 

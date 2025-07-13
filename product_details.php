@@ -239,6 +239,62 @@ if (!$product) {
         text-decoration: none;
     }
 
+    .toast-container {
+        position: fixed;
+        top: 32px;
+        right: 32px;
+        z-index: 9999;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        pointer-events: none;
+    }
+
+    .toast {
+        min-width: 220px;
+        max-width: 350px;
+        background: #fff;
+        color:rgb(255, 255, 255);
+        border-radius: 8px;
+        box-shadow: 0 4px 16px rgba(63, 26, 65, 0.18);
+        padding: 16px 24px;
+        font-size: 1em;
+        font-weight: 500;
+        opacity: 0;
+        transform: translateY(-20px);
+        transition: opacity 0.3s, transform 0.3s;
+        pointer-events: auto;
+        border-left: 6px solid #be95c4;
+    }
+
+    .toast.success {
+        border-left-color: #4bb543;
+    }
+
+    .toast.error {
+        border-left-color: #e74c3c;
+    }
+
+    .toast.show {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+    @media (max-width: 600px) {
+        .toast-container {
+            top: 16px;
+            right: 8px;
+            left: 8px;
+            align-items: center;
+        }
+
+        .toast {
+            min-width: 0;
+            max-width: 98vw;
+            padding: 12px 16px;
+        }
+    }
+
     @media (max-width: 900px) {
         .product-detail-container {
             flex-direction: column;
@@ -261,7 +317,6 @@ if (!$product) {
         }
     }
 </style>
-
 
 <div class="product-detail-container">
     <div class="product-image-area">
@@ -289,7 +344,7 @@ if (!$product) {
     </div>
 </div>
 
-</div>
+<div class="toast-container" id="toast-container"></div>
 
 <?php include 'footer.php'; ?>
 
@@ -303,6 +358,20 @@ if (!$product) {
         if (val < min) val = min;
         if (val > max) val = max;
         qtyInput.value = val;
+    }
+
+    function showToast(message, type = 'success') {
+        const container = document.getElementById('toast-container');
+        if (!container) return;
+        const toast = document.createElement('div');
+        toast.className = `toast ${type}`;
+        toast.textContent = message;
+        container.appendChild(toast);
+        setTimeout(() => toast.classList.add('show'), 10);
+        setTimeout(() => {
+            toast.classList.remove('show');
+            setTimeout(() => container.removeChild(toast), 300);
+        }, 3000);
     }
 
     // Handle add to cart form submission with AJAX
