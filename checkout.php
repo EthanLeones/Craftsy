@@ -388,7 +388,7 @@ if ($user_id) {
     font-size: 0.85rem;
     cursor: pointer;
     transition: all 0.4s ease;
-    font-weight: 300;
+    font-weight: 500;
     text-transform: uppercase;
     letter-spacing: 2px;
     text-decoration: none;
@@ -397,25 +397,25 @@ if ($user_id) {
 }
 
 .checkout-btn-primary {
-    background-color: #000000;
+    background-color: #3f1a41;
     color: #ffffff;
 }
 
 .checkout-btn-primary:hover {
-    background-color: #333333;
+    background-color: #2d1230;
     transform: translateY(-2px);
-    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+    box-shadow: 0 8px 25px rgba(63, 26, 65, 0.3);
 }
 
 .checkout-btn-secondary {
     background-color: transparent;
-    color: #666666;
-    border: 1px solid #e0e0e0;
+    color: #3f1a41;
+    border: 1px solid #3f1a41;
 }
 
 .checkout-btn-secondary:hover {
-    border-color: #000000;
-    color: #000000;
+    background-color: #3f1a41;
+    color: #ffffff;
     transform: translateY(-2px);
 }
 

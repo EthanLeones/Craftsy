@@ -30,6 +30,7 @@ if ($user_id) {
     body {
         background: #f8f9fa;
         font-family: 'Arial', sans-serif;
+        color: #3f1a41;
     }
 
     .cart-page {
@@ -43,8 +44,8 @@ if ($user_id) {
     .cart-title {
         text-align: center;
         font-size: 1.8rem;
-        font-weight: 300;
-        color: #000000;
+        font-weight: 400;
+        color: #3f1a41;
         margin-bottom: 50px;
         text-transform: uppercase;
         letter-spacing: 3px;
@@ -63,12 +64,13 @@ if ($user_id) {
     .cart-table-header th {
         padding: 20px 20px;
         text-align: center;
-        font-weight: 300;
-        color: #000000;
+        font-weight: 500;
+        color: #3f1a41;
         text-transform: uppercase;
         letter-spacing: 1px;
         font-size: 0.9rem;
-        background: none;
+        background: #fafafa;
+        border-bottom: 2px solid #3f1a41;
     }
 
     .cart-table-header th:first-child {
@@ -118,25 +120,25 @@ if ($user_id) {
     .item-details h4 {
         margin: 0 0 8px 0;
         font-size: 1rem;
-        color: #000000;
-        font-weight: 400;
+        color: #3f1a41;
+        font-weight: 500;
         text-transform: uppercase;
         letter-spacing: 0.5px;
     }
 
     .item-details p {
         margin: 0 0 15px 0;
-        color: #000000;
+        color: #666666;
         font-size: 0.85rem;
-        font-weight: 300;
+        font-weight: 400;
         line-height: 1.4;
     }
 
     .price-cell,
     .total-cell {
         text-align: center;
-        font-weight: 300;
-        color: #000000;
+        font-weight: 500;
+        color: #3f1a41;
         font-size: 1rem;
     }
 
@@ -157,15 +159,17 @@ if ($user_id) {
     .quantity-input {
         width: 50px;
         padding: 8px 5px;
-        border: 1px solid white;
+        border: 1px solid #3f1a41;
+        border-left: none;
+        border-right: none;
         text-align: center;
         font-size: 0.9rem;
-        font-weight: 300;
+        font-weight: 500;
         background: white;
         outline: none;
         appearance: none;
         -moz-appearance: textfield;
-        color: #000000;
+        color: #3f1a41;
     }
 
     .quantity-input::-webkit-outer-spin-button,
@@ -177,18 +181,15 @@ if ($user_id) {
     .quantity-btn {
         width: 35px;
         height: 35px;
-        border: none;
-        /* border-left: 1px solid #dee2e6;
-        border-right: 1px solid #dee2e6; */
         background: white;
-        color: #000000;
+        color: #3f1a41;
         cursor: pointer;
         font-size: 1rem;
-        font-weight: 300;
+        font-weight: 500;
         display: flex;
         align-items: center;
         justify-content: center;
-        transition: background-color 0.2s;
+        transition: all 0.2s;
     }
 
     .quantity-btn:first-child {
@@ -200,18 +201,18 @@ if ($user_id) {
     }
 
     .quantity-btn:hover {
-        background: #f8f9fa;
-        color: #000000;
+        background: #3f1a41;
+        color: #ffffff;
     }
 
     .remove-btn {
         background: none;
-        color: #000000;
+        color: #e74c3c;
         border: none;
         padding: 0;
         cursor: pointer;
         font-size: 0.8rem;
-        font-weight: 300;
+        font-weight: 500;
         text-transform: uppercase;
         letter-spacing: 0.5px;
         text-decoration: underline;
@@ -219,7 +220,8 @@ if ($user_id) {
     }
 
     .remove-btn:hover {
-        color: #dc3545;
+        color: #c0392b;
+        background-color: transparent;
     }
 
     .cart-footer {
@@ -234,8 +236,8 @@ if ($user_id) {
 
     .cart-total {
         font-size: 1.5rem;
-        font-weight: 400;
-        color: #000000;
+        font-weight: 600;
+        color: #3f1a41;
     }
 
     .cart-buttons {
@@ -244,41 +246,48 @@ if ($user_id) {
     }
 
     .cart-btn {
-
-        border: none;
-        background: none;
+        border: 1px solid #3f1a41;
+        color: #3f1a41;
+        padding: 15px 30px;
         text-decoration: none;
-        font-weight: 300;
+        font-weight: 500;
         text-transform: uppercase;
         letter-spacing: 1px;
         transition: all 0.2s;
         cursor: pointer;
         font-size: 0.85rem;
-        color: #000000;
     }
 
     .cart-btn:hover {
-        color: #000000;
-        text-decoration: underline;
+        background: #2d1230;
+        border-color: #2d1230;
+        color: #ffffff;
+        text-decoration: none;
+        transform: translateY(-2px);
     }
 
     .empty-cart {
         text-align: center;
         padding: 100px 20px;
-        color: #000000;
+        color: #3f1a41;
         font-size: 1.1rem;
+        font-weight: 400;
     }
 
     .empty-cart .cart-btn {
         margin-top: 20px;
         display: inline-block;
-        border: 1px solid #dee2e6;
+        background: #3f1a41;
+        color: #ffffff;
+        border: 1px solid #3f1a41;
         padding: 15px 30px;
     }
 
     .empty-cart .cart-btn:hover {
-        background: #f8f9fa;
+        background: #2d1230;
+        border-color: #2d1230;
         text-decoration: none;
+        transform: translateY(-2px);
     }
 
     @media (max-width: 768px) {

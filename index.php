@@ -6,40 +6,64 @@ require_once 'includes/session.php';
 
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
 <style>
+         .handbag img {
+            max-width: 400px;
+        }/* Homepage - Ultra Minimalistic & Modern Design */
+    .homepage-wrapper {
+        width: 100%;
+        margin: 0;
+        padding: 0;
+    }
+
     .container2 {
-        display: flex;
-        justify-content: center;
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+        gap: 100px;
+        padding: 100px 40px;
+        max-width: 1600px;
+        margin: 0 auto;
         align-items: center;
-        padding-top: 5rem;
-        gap: 15rem;
-        flex-wrap: wrap;
+        justify-items: center;
     }
 
     .handbag {
-        flex: 1;
-        max-width: 300px;
         text-align: center;
         color: #fff;
+        max-width: 520px;
+        width: 100%;
     }
 
     .handbag img {
-        width: 150%;
+        width: 100%;
+        max-width: 500px;
         height: auto;
-        border-radius: 8px;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-        transform: translateX(-16%);
+        border-radius: 0;
+        box-shadow: 0 15px 50px rgba(0, 0, 0, 0.3);
+        transition: transform 0.4s ease;
+    }
+
+    .handbag img:hover {
+        transform: translateY(-12px) scale(1.02);
     }
 
     .label {
-        font-size: 33px;
-        font-weight: bold;
-        margin-top: 15px;
+        font-size: 1.8rem;
+        font-weight: 400;
+        margin-top: 35px;
+        margin-bottom: 10px;
+        text-transform: uppercase;
+        letter-spacing: 3px;
+        color: #ffffff;
     }
 
     .subtext {
-        font-size: 18px;
-        margin-top: 5px;
+        font-size: 1rem;
+        margin-top: 0;
         opacity: 0.8;
+        font-weight: 300;
+        letter-spacing: 1px;
+        line-height: 1.4;
+        color: #ffffff;
     }
 
     body {
@@ -48,81 +72,75 @@ require_once 'includes/session.php';
         overflow-y: scroll;
         margin: 0;
         padding: 0;
-
     }
 
     section {
         margin: 0;
         padding: 0;
-        height: 100vh;
+        min-height: 100vh;
         max-width: 100%;
         scroll-snap-align: start;
         background-size: cover;
         background-position: center;
         border: none;
-        gap: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
     }
 
     .section1 {
-        scroll-snap-align: start;
         height: 100vh;
-        margin: 0;
-        padding: 0;
-        border: none;
         background-image: url('images/bg1.png');
         background-size: cover;
         background-position: center;
+        position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
     }
 
     .section2 {
-        scroll-snap-align: start;
-        height: 100vh;
-        margin: 0;
-        padding: 0;
-        border: none;
+        min-height: 100vh;
         background-color: #3f1a41;
+        padding: 0;
     }
 
     .section3 {
-        scroll-snap-align: start;
-        height: 70vh;
-        margin: 0;
-        padding: 0;
-        border: none;
-        background-color: #231942;
+        min-height: 70vh;
+        background-color: #3f1a41;
         background-image: url('images/bg3.png');
         background-size: cover;
         background-position: center;
         display: flex;
-        flex-direction: column;
         align-items: center;
+        justify-content: center;
     }
 
-
     .handbag-text {
-        position: absolute;
-        top: 30%;
-        left: 5%;
-        background-color: #231942;
-        opacity: 0.8;
+        max-width: 600px;
+        padding: 40px;
+        margin-left: 5%;
+        background-color: rgba(63, 26, 65, 0.9);
         color: white;
         text-align: left;
-        z-index: 1;
-        max-width: 700px;
-        padding-left: 1rem;
-        margin: 0;
+        backdrop-filter: blur(10px);
     }
 
     .handbag-text h1 {
-        font-size: 2.5rem;
-        font-weight: 500;
-        padding-bottom: 0;
-        letter-spacing: 1px;
+        font-size: 2.8rem;
+        font-weight: 300;
+        margin-bottom: 20px;
+        letter-spacing: 2px;
+        line-height: 1.2;
+        text-transform: uppercase;
     }
 
     .handbag-text p {
-        font-size: 1.4rem;
+        font-size: 1.1rem;
         line-height: 1.6;
+        font-weight: 300;
+        letter-spacing: 0.5px;
+        margin: 0;
     }
 
     .newsletter {
@@ -131,115 +149,278 @@ require_once 'includes/session.php';
         align-items: center;
         justify-content: center;
         text-align: center;
-        padding: 2rem;
-        color: rgb(255, 255, 255);
+        padding: 60px 40px;
+        color: #ffffff;
+        max-width: 600px;
+        width: 100%;
     }
 
     .newsletter h1 {
-        margin-top: 10rem;
-        font-size: 2.5rem;
-        font-weight: 700;
-        margin-bottom: 0.3rem;
+        font-size: 2.2rem;
+        font-weight: 300;
+        margin-bottom: 15px;
+        text-transform: uppercase;
+        letter-spacing: 4px;
     }
 
     .newsletter p {
-        margin-top: 0;
-        font-size: 1.2rem;
+        font-size: 1rem;
+        margin-bottom: 40px;
+        font-weight: 300;
+        letter-spacing: 1px;
+        opacity: 0.9;
     }
 
-    /* Responsive adjustments for .container2 and .handbag */
+    .newsletter-form {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 25px;
+        width: 100%;
+        max-width: 400px;
+    }
+
+    .newsletter-form input[type="email"] {
+        width: 100%;
+        padding: 20px 0 15px 0;
+        border: none;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.5);
+        background-color: transparent;
+        font-size: 1rem;
+        color: #ffffff;
+        box-sizing: border-box;
+        transition: all 0.4s ease;
+        font-weight: 300;
+        text-align: center;
+    }
+
+    .newsletter-form input[type="email"]:focus {
+        outline: none;
+        border-bottom-color: #ffffff;
+        transform: translateY(-2px);
+    }
+
+    .newsletter-form input[type="email"]::placeholder {
+        color: rgba(255, 255, 255, 0.7);
+        font-weight: 300;
+        text-align: center;
+    }
+
+    .newsletter-form button {
+        background-color: #ffffff;
+        color: #3f1a41;
+        padding: 15px 40px;
+        border: none;
+        font-size: 0.85rem;
+        cursor: pointer;
+        transition: all 0.4s ease;
+        font-weight: 400;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        border-radius: 0;
+    }
+
+    .newsletter-form button:hover {
+        background-color: rgba(255, 255, 255, 0.9);
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(255, 255, 255, 0.3);
+    }
+
+    /* Responsive Design */
     @media (max-width: 1200px) {
         .container2 {
-            gap: 5rem;
-            padding-top: 2rem;
+            gap: 40px;
+            padding: 60px 30px;
+        }
+        
+        .handbag-text {
+            margin-left: 3%;
+            padding: 30px;
+        }
+        
+        .handbag-text h1 {
+            font-size: 2.4rem;
         }
     }
 
     @media (max-width: 900px) {
         .container2 {
-            flex-direction: column;
-            align-items: center;
-            gap: 2rem;
-            padding-top: 1.5rem;
-        }
-
-        .handbag img {
-            width: 100%;
-            transform: none;
+            grid-template-columns: 1fr;
+            gap: 60px;
+            padding: 50px 20px;
         }
 
         .handbag {
-            max-width: 90vw;
+            max-width: 550px;
+        }
+
+        .handbag img {
+            max-width: 450px;
+        }
+
+        .section1 {
+            align-items: flex-start;
+            padding-top: 120px;
+        }
+
+        .handbag-text {
+            margin-left: 0;
+            margin: 0 20px;
+            max-width: none;
+            width: calc(100% - 40px);
+        }
+
+        .handbag-text h1 {
+            font-size: 2rem;
+            letter-spacing: 1px;
+        }
+
+        .handbag-text p {
+            font-size: 1rem;
+        }
+
+        .newsletter {
+            padding: 40px 20px;
+        }
+
+        .newsletter h1 {
+            font-size: 1.8rem;
+            letter-spacing: 3px;
         }
     }
 
     @media (max-width: 600px) {
+        .container2 {
+            padding: 40px 15px;
+            gap: 40px;
+        }
+
         .handbag {
-            max-width: 100vw;
+            max-width: 100%;
+        }
+
+        .handbag img {
+            max-width: 280px;
         }
 
         .label {
-            font-size: 1.3em;
+            font-size: 1.4rem;
+            letter-spacing: 2px;
         }
 
         .subtext {
-            font-size: 1em;
+            font-size: 0.9rem;
+        }
+
+        .section1 {
+            padding-top: 100px;
+        }
+
+        .handbag-text {
+            margin: 0 15px;
+            padding: 25px;
+        }
+
+        .handbag-text h1 {
+            font-size: 1.6rem;
+            letter-spacing: 1px;
+        }
+
+        .handbag-text p {
+            font-size: 0.95rem;
+        }
+
+        .newsletter {
+            padding: 30px 15px;
         }
 
         .newsletter h1 {
-            margin-top: 2rem;
             font-size: 1.5rem;
+            letter-spacing: 2px;
         }
 
-        .newsletter input[type="email"] {
-            width: 90vw !important;
-            font-size: 1em;
+        .newsletter p {
+            font-size: 0.9rem;
+        }
+
+        .newsletter-form {
+            max-width: 100%;
+        }
+
+        .newsletter-form button {
+            padding: 12px 30px;
+            font-size: 0.8rem;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .section1 {
+            padding-top: 80px;
+        }
+
+        .handbag-text h1 {
+            font-size: 1.4rem;
+        }
+
+        .handbag-text p {
+            font-size: 0.9rem;
+        }
+
+        .newsletter h1 {
+            font-size: 1.3rem;
+            letter-spacing: 1px;
+        }
+
+        .newsletter-form input[type="email"] {
+            font-size: 0.9rem;
+            padding: 15px 0 12px 0;
+        }
+
+        .newsletter-form button {
+            padding: 10px 25px;
+            font-size: 0.75rem;
         }
     }
 </style>
 
-<body>
+<div class="homepage-wrapper">
     <div class="section section1">
         <div class="handbag-text">
-            <h1>HANDCRAFTED BAYONG BAGS</h1>
+            <h1>Handcrafted Bayong Bags</h1>
             <p>Discover our collection of beautifully crafted Filipino bags that blend tradition with modern style.</p>
         </div>
     </div>
+    
     <div class="section section2">
         <div class="container2">
             <div class="handbag">
                 <img src="images/handbag1.png" alt="Handcrafted handbag with sunflowers">
-                <div class="label">handcrafted</div>
-                <div class="subtext">carefully made by skilled artisans</div>
+                <div class="label">Handcrafted</div>
+                <div class="subtext">Carefully made by skilled artisans</div>
             </div>
             <div class="handbag">
                 <img src="images/handbag2.png" alt="Sustainable handbag with purple flowers">
-                <div class="label">sustainable</div>
-                <div class="subtext">eco-friendly materials and practices</div>
+                <div class="label">Sustainable</div>
+                <div class="subtext">Eco-friendly materials and practices</div>
             </div>
             <div class="handbag">
                 <img src="images/handbag3.png" alt="Unique handbag with yellow flowers">
-                <div class="label">unique</div>
-                <div class="subtext">one-of-a-kind designs for every style</div>
+                <div class="label">Unique</div>
+                <div class="subtext">One-of-a-kind designs for every style</div>
             </div>
         </div>
-
     </div>
+    
     <div class="section section3">
         <div class="newsletter">
-            <h1>STAY UPDATED</h1>
-            <p>subscribe to our newsletter for exclusive offers and updates</p>
-
-            <form action="subscribe_newsletter.php" method="post" style="display: flex; flex-direction: column; align-items: center; gap: 10px;">
-                <input type="email" name="email" placeholder="Enter your email address" required style="padding: 10px; width: 300px; border-radius: 5px; border: 1px solid #ccc; opacity: 0.8;">
+            <h1>Stay Updated</h1>
+            <p>Subscribe to our newsletter for exclusive offers and updates</p>
+            <form action="subscribe_newsletter.php" method="post" class="newsletter-form">
+                <input type="email" name="email" placeholder="Enter your email address" required>
                 <button type="submit">Subscribe</button>
             </form>
         </div>
     </div>
-</body>
-
-</html>
-
 </div>
 
 <?php include 'footer.php'; ?>

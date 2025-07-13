@@ -203,18 +203,21 @@ if (!$product) {
         color: #fff;
         border: none;
         border-radius: 10px;
-        font-weight: 300;
+        font-weight: 500;
         font-size: 1em;
         cursor: pointer;
-        transition: background 0.2s;
+        transition: all 0.2s;
         letter-spacing: 0.5px;
         box-shadow: none;
         margin-left: 8px;
+        text-transform: uppercase;
     }
 
     .add-to-cart-form button[type="submit"]:hover {
-        background: #be95c4;
-        color: #231942;
+        background: #2d1230;
+        color: #ffffff;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(63, 26, 65, 0.3);
     }
 
     .continue-shopping-button {

@@ -12,7 +12,7 @@ include 'header.php';
             <input type="email" id="fp-email" name="email" required autocomplete="email">
         </div>
         <div style="display: flex; justify-content: space-between; align-items: center; gap: 10px;">
-            <a href="login.php" style="display: inline-block; padding: 10px 22px; background: #e0b1cb; color: #231942; border-radius: 5px; text-decoration: none; font-weight: 600; transition: background 0.2s;">
+            <a href="login.php" style="display: inline-block; padding: 10px 22px; background: #e0b1cb; color: #3f1a41; border-radius: 5px; text-decoration: none; font-weight: 600; transition: background 0.2s;">
                 &larr; Back to Login
             </a>
             <button type="submit" style="padding: 10px 22px; border-radius: 5px; background: #5E548E; color: #fff; border: none; font-weight: 600;">

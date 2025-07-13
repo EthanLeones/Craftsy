@@ -88,7 +88,7 @@ try {
     }
 
     .sidebar h3 {
-        color: #231942;
+        color: #3f1a41;
         margin-top: 0;
         margin-bottom: 18px;
         text-align: left;
@@ -115,7 +115,7 @@ try {
     .sidebar a {
         display: block;
         padding: 12px 16px;
-        color: #231942;
+        color: #3f1a41;
         text-decoration: none;
         border-radius: 7px;
         text-align: left;

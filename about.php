@@ -40,7 +40,7 @@
 
     /* Story Section Styles */
     .story-section {
-        background-color: #5a2d5a;
+        background-color: #3f1a41;
     }
 
     .story-section h2 {
@@ -65,7 +65,7 @@
     }
 
     .values-section h2 {
-        color: #5a2d5a;
+        color: #3f1a41;
         font-size: 2.5rem;
         font-weight: bold;
         margin-bottom: 30px;
@@ -84,7 +84,7 @@
     }
 
     .value-item h3 {
-        color: #5a2d5a;
+        color: #3f1a41;
         font-size: 1.3rem;
         font-weight: bold;
         margin-bottom: 8px;
@@ -98,7 +98,7 @@
 
     /* Artisans Section Styles */
     .artisans-section {
-        background-color: #5a2d5a;
+        background-color: #3f1a41;
     }
 
     .artisans-section h2 {

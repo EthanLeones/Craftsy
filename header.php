@@ -31,7 +31,7 @@ $current_page = basename($_SERVER['PHP_SELF']);
         }
 
         .profile-dropdown .dropdown-content a {
-            color: #231942;
+            color: #3f1a41;
             padding: 12px 16px;
             text-decoration: none;
             display: block;
@@ -95,11 +95,36 @@ $current_page = basename($_SERVER['PHP_SELF']);
 
     <div class="container main-content">
 
+<script>
+// Global Toast Notification Function
+function showToast(message, type) {
+    const toast = document.createElement('div');
+    toast.className = 'toast ' + type;
+    toast.textContent = message;
+    document.body.appendChild(toast);
+    setTimeout(() => {
+        toast.classList.add('show');
+        setTimeout(() => {
+            toast.classList.remove('show');
+            setTimeout(() => {
+                if (document.body.contains(toast)) {
+                    document.body.removeChild(toast);
+                }
+            }, 300);
+        }, 3000);
+    }, 100);
+}
+</script>
+
 <?php
 if (isset($_SESSION['alert'])) {
     $alert_type = $_SESSION['alert']['type'];
     $alert_message = $_SESSION['alert']['message'];
-    echo "<script>alert('" . addslashes($alert_message) . "');</script>";
+    echo "<script>
+        document.addEventListener('DOMContentLoaded', function() {
+            showToast('" . addslashes($alert_message) . "', '" . ($alert_type === 'success' ? 'success' : 'error') . "');
+        });
+    </script>";
     unset($_SESSION['alert']);
 }
 ?>
