@@ -168,7 +168,7 @@ try {
             button.addEventListener('click', function() {
                 const productId = this.getAttribute('data-id');
                 console.log('Update stock for product ID:', productId);
-                 window.location.href = 'edit_product.php?id=' + productId;
+                 window.location.href = 'process_edit_product.php?id=' + productId;
             });
         });
     });
