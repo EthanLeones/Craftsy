@@ -42,6 +42,9 @@ if (isset($_SESSION['alert_message'])) {
 }
 ?>
 
+<!-- Toast Container -->
+<div id="toast-container"></div>
+
 <div class="contact-page-wrapper">
     <h1 class="contact-page-title">Contact Admin</h1>
     
