@@ -254,7 +254,7 @@ if (!$product) {
         min-width: 220px;
         max-width: 350px;
         background: #fff;
-        color:rgb(255, 255, 255);
+        color: rgb(255, 255, 255);
         border-radius: 8px;
         box-shadow: 0 4px 16px rgba(63, 26, 65, 0.18);
         padding: 16px 24px;
@@ -356,8 +356,31 @@ if (!$product) {
         const max = parseInt(qtyInput.max, 10) || 99;
         val += delta;
         if (val < min) val = min;
-        if (val > max) val = max;
+        if (val > max) {
+            val = max;
+            showToast('Cannot add more than ' + max + ' items. Stock limit reached.', 'error');
+        }
         qtyInput.value = val;
+    }
+
+    function validateQuantity(quantityInput) {
+        const newQuantity = parseInt(quantityInput.value);
+        const stockLimit = parseInt(quantityInput.max);
+        const min = parseInt(quantityInput.min) || 1;
+
+        if (isNaN(newQuantity) || newQuantity < min) {
+            quantityInput.value = min;
+            showToast('Please enter a valid quantity (minimum ' + min + ').', 'error');
+            return false;
+        }
+
+        if (newQuantity > stockLimit) {
+            quantityInput.value = stockLimit;
+            showToast('Cannot add more than ' + stockLimit + ' items. Stock limit reached.', 'error');
+            return false;
+        }
+
+        return true;
     }
 
     function showToast(message, type = 'success') {
@@ -377,9 +400,27 @@ if (!$product) {
     // Handle add to cart form submission with AJAX
     document.addEventListener('DOMContentLoaded', function() {
         const form = document.getElementById('add-to-cart-form');
+        const quantityInput = document.getElementById('quantity');
+
+        // Add input validation listener
+        if (quantityInput) {
+            quantityInput.addEventListener('input', function() {
+                validateQuantity(this);
+            });
+
+            quantityInput.addEventListener('blur', function() {
+                validateQuantity(this);
+            });
+        }
+
         if (form) {
             form.addEventListener('submit', function(e) {
                 e.preventDefault();
+
+                // Validate quantity before submission
+                if (!validateQuantity(quantityInput)) {
+                    return;
+                }
 
                 const formData = new FormData(form);
 
