@@ -25,7 +25,7 @@
         </div>
     </footer>
     <div class="footer-bottom">
-        <p>&copy; 2023 Craftsy Nook. All rights reserved.</p>
+        <p>&copy; 2025 Craftsy Nook. All rights reserved.</p>
     </div>
 
     <div id="toast-container" style="position: fixed; top: 24px; right: 24px; z-index: 9999;"></div>
