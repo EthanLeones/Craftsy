@@ -2409,22 +2409,23 @@ button:hover {
 /* Toast Notification Styles */
 
 .toast {
-    position: fixed !important;
-    bottom: 20px !important;
-    right: -500px;
-    /* Start further off-screen */
-    background-color: #3f1a41;
-    color: white !important;
-    padding: 16px 24px;
-    border-radius: 8px;
-    font-size: 14px;
-    font-weight: 500;
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    left: auto;
+    transform: none;
     min-width: 300px;
     max-width: 450px;
+    padding: 14px 24px;
+    border-radius: 6px;
+    color: #fff;
+    font-size: 1rem;
+    z-index: 9999;
+    opacity: 0;
+    pointer-events: none;
+    background: #333;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-    z-index: 10001 !important;
-    transition: right 0.4s ease-in-out;
-    letter-spacing: 0.5px;
+    transition: opacity 0.3s, right 0.4s, top 0.3s;
     display: flex !important;
     align-items: center;
     justify-content: space-between;

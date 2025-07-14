@@ -22,12 +22,6 @@ if (isset($_SESSION['alert_message'])) {
                 alert("' . addslashes($message) . '");
             }
         });
-        
-        // Also try immediately
-        if (typeof showToast === "function") {
-            console.log("Calling showToast immediately");
-            showToast("' . addslashes($message) . '", "' . $type . '");
-        }
     </script>';
     unset($_SESSION['alert_message']);
     unset($_SESSION['alert_type']);
@@ -70,6 +64,7 @@ if (isset($_SESSION['alert_message'])) {
         const username = this.querySelector('#username').value.trim();
         const password = this.querySelector('#password').value.trim();
 
+        // Only show toast for client-side validation errors
         if (!username || !password) {
             e.preventDefault();
             showToast('Please fill in all fields', 'error');
@@ -92,9 +87,6 @@ if (isset($_SESSION['alert_message'])) {
         submitBtn.disabled = true;
         submitBtn.textContent = 'Signing In...';
         submitBtn.style.opacity = '0.7';
-
-        // Show loading toast
-        showToast('Attempting to sign in...', 'info', 2000);
     });
 
     // Add input event listeners for real-time feedback
@@ -105,6 +97,89 @@ if (isset($_SESSION['alert_message'])) {
     document.getElementById('password').addEventListener('input', function() {
         this.style.borderColor = this.value.length >= 6 ? '#28a745' : '#dc3545';
     });
+
+    document.querySelector('.toast')
+
+    if (!document.getElementById('toast-style')) {
+        const style = document.createElement('style');
+        style.id = 'toast-style';
+        style.textContent = `
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            left: auto;
+            transform: none;
+            min-width: 300px;
+            max-width: 450px;
+            padding: 14px 24px;
+            border-radius: 6px;
+            color: #fff;
+            font-size: 1rem;
+            z-index: 9999;
+            opacity: 0;
+            pointer-events: none;
+            background: #333;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            transition: opacity 0.3s, right 0.4s, top 0.3s;
+            display: flex !important;
+            align-items: center;
+            justify-content: space-between;
+            word-wrap: break-word;
+        }
+        .toast.show {
+            opacity: 1;
+            pointer-events: auto;
+            right: 20px;
+            top: auto;
+        }
+        .toast.success { background: #28a745; }
+        .toast.error { background: #dc3545; }
+        .toast.info { background: #007bff; }
+        .toast.warning { background: #f39c12; }
+        .toast button {
+            background: none !important;
+            border: none !important;
+            color: inherit !important;
+            font-size: 18px !important;
+            font-weight: bold !important;
+            margin-left: 10px !important;
+            cursor: pointer !important;
+            padding: 0 5px !important;
+            text-transform: none !important;
+            letter-spacing: normal !important;
+            transition: opacity 0.3s ease !important;
+            flex-shrink: 0;
+        }
+        .toast button:hover {
+            opacity: 0.7 !important;
+            background: none !important;
+            color: inherit !important;
+            transform: none !important;
+            box-shadow: none !important;
+        }
+        .toast:not(:first-of-type) {
+            bottom: calc(20px + (80px * var(--toast-index, 0)));
+        }
+        @media (max-width: 600px) {
+            .toast {
+                left: 50%;
+                right: auto;
+                transform: translateX(-50%);
+                min-width: 90vw;
+                max-width: 98vw;
+                font-size: 0.95rem;
+                padding: 12px 10px;
+            }
+            .toast.show {
+                right: auto;
+                left: 50%;
+                transform: translateX(-50%);
+            }
+        }
+        `;
+        document.head.appendChild(style);
+    }
 </script>
 
 <?php include 'footer.php'; ?>
