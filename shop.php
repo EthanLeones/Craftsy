@@ -13,17 +13,27 @@ $categories = [
     ['name' => 'Sling', 'link' => 'shop.php?category=Sling'],
     ['name' => 'Carry All', 'link' => 'shop.php?category=Carry All'],
     ['name' => 'Accessories', 'link' => 'shop.php?category=Accessories'],
+    ['name' => 'Out of Stock', 'link' => 'shop.php?category=Out of Stock'],
 ];
 
-$sql = "SELECT * FROM products WHERE stock_quantity > 0 AND active = 1";
+// Check if filtering by out of stock category
+$show_out_of_stock_only = isset($_GET['category']) && $_GET['category'] === 'Out of Stock';
+
+if ($show_out_of_stock_only) {
+    $sql = "SELECT * FROM products WHERE stock_quantity = 0 AND active = 1";
+} else {
+    $sql = "SELECT * FROM products WHERE active = 1";
+}
 $params = [];
 
 if (isset($_GET['category']) && !empty($_GET['category'])) {
     $selected_category = $_GET['category'];
     $valid_categories = array_column($categories, 'name');
     if (in_array($selected_category, $valid_categories)) {
-        $sql .= " AND category = ?";
-        $params[] = $selected_category;
+        if ($selected_category !== 'Out of Stock') {
+            $sql .= " AND category = ?";
+            $params[] = $selected_category;
+        }
     } else {
         error_log("Invalid category filter: " . htmlspecialchars($selected_category));
         $_SESSION['alert'] = ['type' => 'warning', 'message' => 'Invalid category selected.'];
@@ -40,7 +50,11 @@ if (isset($_GET['search']) && !empty(trim($_GET['search']))) {
     $params[] = '%' . $search_query . '%';
 }
 
-$sql .= " ORDER BY created_at DESC";
+if ($show_out_of_stock_only) {
+    $sql .= " ORDER BY created_at DESC";
+} else {
+    $sql .= " ORDER BY stock_quantity > 0 DESC, created_at DESC";
+}
 
 try {
     $conn = getDBConnection();
@@ -194,6 +208,20 @@ try {
         box-shadow: none;
         width: 100%;
         max-width: 280px;
+    }
+
+    .product-item.out-of-stock {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
+
+    .product-item.out-of-stock img {
+        filter: grayscale(100%);
+    }
+
+    .product-item.out-of-stock:hover img {
+        transform: none;
+        filter: grayscale(100%);
     }
 
 
@@ -355,13 +383,21 @@ try {
                 <p style="text-align: center; grid-column: 1 / -1;">No products available at the moment.</p>
             <?php else: ?>
                 <?php foreach ($products as $product): ?>
-                    <div class="product-item" onclick="window.location.href='product_details.php?id=<?php echo htmlspecialchars($product['id']); ?>'">
+                    <?php $is_out_of_stock = $product['stock_quantity'] <= 0; ?>
+                    <div class="product-item <?php echo $is_out_of_stock ? 'out-of-stock' : ''; ?>"
+                        onclick="<?php echo $is_out_of_stock ? '' : "window.location.href='product_details.php?id=" . htmlspecialchars($product['id']) . "'"; ?>">
                         <img src="<?php echo htmlspecialchars($product['image_url'] ?? 'images/placeholder.png'); ?>"
                             alt="<?php echo htmlspecialchars($product['name']); ?>"
-                            onclick="event.stopPropagation(); window.location.href='product_details.php?id=<?php echo htmlspecialchars($product['id']); ?>'">
+                            onclick="<?php echo $is_out_of_stock ? 'event.stopPropagation();' : "event.stopPropagation(); window.location.href='product_details.php?id=" . htmlspecialchars($product['id']) . "'"; ?>">
                         <div class="product-desc">
                             <div class="product-name"><?php echo htmlspecialchars($product['name']); ?></div>
-                            <div class="product-stock">In Stock - <?php echo htmlspecialchars($product['stock_quantity']); ?></div>
+                            <div class="product-stock">
+                                <?php if ($is_out_of_stock): ?>
+                                    Out of Stock
+                                <?php else: ?>
+                                    In Stock - <?php echo htmlspecialchars($product['stock_quantity']); ?>
+                                <?php endif; ?>
+                            </div>
                             <div class="product-price">P<?php echo htmlspecialchars(number_format($product['price'], 2)); ?></div>
                         </div>
                     </div>

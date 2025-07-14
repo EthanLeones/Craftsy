@@ -40,6 +40,94 @@ try {
     $error_message = "Unable to load inventory data.";
 }
 ?>
+<style>
+    .highlight-product {
+        background-color: #fff3cd !important;
+        border: 2px solid #856404 !important;
+        transition: all 0.3s ease;
+    }
+
+    .modal {
+        display: none;
+        position: fixed;
+        z-index: 1000;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+    }
+
+    .modal-content {
+        background-color: #fefefe;
+        margin: 15% auto;
+        padding: 20px;
+        border: 1px solid #888;
+        border-radius: 8px;
+        width: 80%;
+        max-width: 500px;
+        position: relative;
+    }
+
+    .close-button {
+        color: #aaa;
+        float: right;
+        font-size: 28px;
+        font-weight: bold;
+        position: absolute;
+        right: 15px;
+        top: 10px;
+        cursor: pointer;
+    }
+
+    .close-button:hover,
+    .close-button:focus {
+        color: black;
+        text-decoration: none;
+    }
+
+    .form-group {
+        margin-bottom: 15px;
+    }
+
+    .form-group label {
+        display: block;
+        margin-bottom: 5px;
+        font-weight: 500;
+    }
+
+    .form-group input {
+        width: 100%;
+        padding: 8px 12px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        font-size: 14px;
+    }
+
+    .form-group input:focus {
+        outline: none;
+        border-color: #9f86c0;
+        box-shadow: 0 0 0 2px rgba(159, 134, 192, 0.2);
+    }
+
+    .form-group button {
+        margin-right: 10px;
+    }
+
+    .button.secondary {
+        background-color: #6c757d;
+        color: white;
+        border: none;
+        padding: 8px 16px;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 14px;
+    }
+
+    .button.secondary:hover {
+        background-color: #5a6268;
+    }
+</style>
 <div class="admin-wrapper">
     <button class="mobile-menu-toggle" onclick="toggleMobileMenu()">
         <i class="fas fa-bars"></i>
@@ -95,18 +183,18 @@ try {
                             </tr>
                         <?php else: ?>
                             <?php foreach ($top_selling_products as $product): ?>
-                                <tr>
+                                <tr id="product-<?php echo $product['id']; ?>">
                                     <td>
                                         <div class="product-info-cell">
                                             <img src="../<?php echo htmlspecialchars($product['image_url'] ?? 'images/placeholder.png'); ?>" alt="<?php echo htmlspecialchars($product['name']); ?>" class="product-thumbnail">
                                             <span><?php echo htmlspecialchars($product['name']); ?></span>
                                         </div>
                                     </td>
-                                    <td><span class="stock-badge <?php echo ($product['stock_quantity'] <= 5) ? 'low-stock' : 'in-stock'; ?>"><?php echo htmlspecialchars($product['stock_quantity']); ?></span></td>
+                                    <td><span class="stock-badge <?php echo ($product['stock_quantity'] <= 5) ? 'low-stock' : 'in-stock'; ?>" id="stock-display-<?php echo $product['id']; ?>"><?php echo htmlspecialchars($product['stock_quantity']); ?></span></td>
                                     <td><span class="sales-badge"><?php echo htmlspecialchars($product['sold_count'] ?? 0); ?></span></td>
                                     <td><span class="revenue-text">P<?php echo htmlspecialchars(number_format($product['revenue'] ?? 0, 2)); ?></span></td>
                                     <td>
-                                        <button class="button small update-stock-button" data-id="<?php echo htmlspecialchars($product['id']); ?>"><i class="fas fa-edit"></i> Update Stock</button>
+                                        <button class="button small update-stock-button" data-id="<?php echo htmlspecialchars($product['id']); ?>" data-current-stock="<?php echo htmlspecialchars($product['stock_quantity']); ?>" data-product-name="<?php echo htmlspecialchars($product['name']); ?>"><i class="fas fa-edit"></i> Update Stock</button>
                                     </td>
                                 </tr>
                             <?php endforeach; ?>
@@ -138,17 +226,17 @@ try {
                           </tr>
                       <?php else: ?>
                           <?php foreach ($low_stock_products as $product): ?>
-                              <tr>
+                              <tr id="product-<?php echo $product['id']; ?>">
                                   <td>
                                       <div class="product-info-cell">
                                           <img src="../<?php echo htmlspecialchars($product['image_url'] ?? 'images/placeholder.png'); ?>" alt="<?php echo htmlspecialchars($product['name']); ?>" class="product-thumbnail">
                                           <span><?php echo htmlspecialchars($product['name']); ?></span>
                                       </div>
                                   </td>
-                                  <td><span class="stock-badge low-stock"><?php echo htmlspecialchars($product['stock_quantity']); ?></span></td>
+                                  <td><span class="stock-badge low-stock" id="stock-display-<?php echo $product['id']; ?>"><?php echo htmlspecialchars($product['stock_quantity']); ?></span></td>
                                   <td><span class="price-text">P<?php echo htmlspecialchars(number_format($product['price'], 2)); ?></span></td>
                                   <td>
-                                      <button class="button small update-stock-button" data-id="<?php echo htmlspecialchars($product['id']); ?>"><i class="fas fa-edit"></i> Update Stock</button>
+                                      <button class="button small update-stock-button" data-id="<?php echo htmlspecialchars($product['id']); ?>" data-current-stock="<?php echo htmlspecialchars($product['stock_quantity']); ?>" data-product-name="<?php echo htmlspecialchars($product['name']); ?>"><i class="fas fa-edit"></i> Update Stock</button>
                                   </td>
                               </tr>
                           <?php endforeach; ?>
@@ -158,18 +246,144 @@ try {
          </div>
      </div>
 </div> 
-</div> 
+</div>
+
+<!-- Update Stock Modal -->
+<div id="update-stock-modal" class="modal" style="display:none;">
+    <div class="modal-content">
+        <span class="close-button">&times;</span>
+        <h3>Update Stock Quantity</h3>
+        <form id="update-stock-form">
+            <input type="hidden" id="update_product_id" name="product_id">
+            <div class="form-group">
+                <label for="product_name_display">Product:</label>
+                <input type="text" id="product_name_display" readonly style="background-color: #f5f5f5;">
+            </div>
+            <div class="form-group">
+                <label for="current_stock_display">Current Stock:</label>
+                <input type="text" id="current_stock_display" readonly style="background-color: #f5f5f5;">
+            </div>
+            <div class="form-group">
+                <label for="new_stock_quantity">New Stock Quantity:</label>
+                <input type="number" id="new_stock_quantity" name="stock_quantity" min="0" required>
+            </div>
+            <div class="form-group">
+                <button type="submit" class="button primary">Update Stock</button>
+                <button type="button" class="button secondary" onclick="closeStockModal()">Cancel</button>
+            </div>
+        </form>
+    </div>
+</div>
+
 <?php
 ?>
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         const updateStockButtons = document.querySelectorAll('.update-stock-button');
+        const updateStockModal = document.getElementById('update-stock-modal');
+        const updateStockForm = document.getElementById('update-stock-form');
+        const closeButton = document.querySelector('.close-button');
+
+        // Check if we need to scroll to a specific product (from dashboard restock link)
+        const hash = window.location.hash;
+        if (hash && hash.startsWith('#product-')) {
+            const productId = hash.replace('#product-', '');
+            const productElement = document.querySelector(`[data-id="${productId}"]`);
+            if (productElement) {
+                productElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                productElement.classList.add('highlight-product');
+                setTimeout(() => {
+                    productElement.classList.remove('highlight-product');
+                }, 3000);
+            }
+        }
+
         updateStockButtons.forEach(button => {
             button.addEventListener('click', function() {
                 const productId = this.getAttribute('data-id');
+                const currentStock = this.getAttribute('data-current-stock');
+                const productName = this.getAttribute('data-product-name');
+                
                 console.log('Update stock for product ID:', productId);
-                 window.location.href = 'process_edit_product.php?id=' + productId;
+                
+                // Populate the modal
+                document.getElementById('update_product_id').value = productId;
+                document.getElementById('product_name_display').value = productName;
+                document.getElementById('current_stock_display').value = currentStock;
+                document.getElementById('new_stock_quantity').value = currentStock;
+                
+                // Show the modal
+                updateStockModal.style.display = 'block';
+                document.getElementById('new_stock_quantity').focus();
             });
         });
+
+        // Handle form submission
+        updateStockForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(this);
+            const submitButton = this.querySelector('button[type="submit"]');
+            const productId = formData.get('product_id');
+            const newStock = formData.get('stock_quantity');
+            
+            setButtonLoading(submitButton, true);
+            
+            fetch('process_update_stock.php', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showToast(data.message, 'success');
+                    
+                    // Update the stock display in the table
+                    const stockDisplay = document.getElementById('stock-display-' + productId);
+                    if (stockDisplay) {
+                        stockDisplay.textContent = newStock;
+                        
+                        // Update the stock badge class
+                        stockDisplay.className = 'stock-badge ' + (newStock <= 5 ? 'low-stock' : 'in-stock');
+                    }
+                    
+                    // Update the button's data attribute
+                    const button = document.querySelector(`[data-id="${productId}"]`);
+                    if (button) {
+                        button.setAttribute('data-current-stock', newStock);
+                    }
+                    
+                    // Close the modal
+                    updateStockModal.style.display = 'none';
+                    
+                    // Refresh the page after a short delay to update all sections
+                    setTimeout(() => window.location.reload(), 1000);
+                } else {
+                    showToast(data.message || 'Error updating stock. Please try again.', 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showToast('An error occurred while updating stock. Please try again.', 'error');
+            })
+            .finally(() => {
+                setButtonLoading(submitButton, false);
+            });
+        });
+
+        // Close modal functionality
+        closeButton.addEventListener('click', function() {
+            updateStockModal.style.display = 'none';
+        });
+
+        window.addEventListener('click', function(event) {
+            if (event.target === updateStockModal) {
+                updateStockModal.style.display = 'none';
+            }
+        });
     });
-</script> 
+
+    function closeStockModal() {
+        document.getElementById('update-stock-modal').style.display = 'none';
+    }
+</script>

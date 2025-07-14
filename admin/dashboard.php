@@ -157,7 +157,7 @@ try {
                                     <div class="stock-product-name"><?php echo htmlspecialchars($product['name']); ?></div>
                                     <div class="stock-quantity"><?php echo htmlspecialchars($product['stock_quantity']); ?> left in stock</div>
                                 </div>
-                                <a href="products.php?edit_product_id=<?php echo htmlspecialchars($product['id']); ?>" class="button small">Restock</a>
+                                <a href="inventory.php#product-<?php echo htmlspecialchars($product['id']); ?>" class="button small">Restock</a>
                             </div>
                         <?php endforeach; ?>
                         <?php if ($total_low_stock_pages > 1): ?>

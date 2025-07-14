@@ -11,7 +11,15 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 try {
     $required_fields = ['product_id', 'product_name', 'category', 'price', 'stock_quantity'];
     foreach ($required_fields as $field) {
-        if (!isset($_POST[$field]) || empty($_POST[$field])) {
+        if (!isset($_POST[$field])) {
+            throw new Exception("Missing required field: $field");
+        }
+        // Special handling for stock_quantity to allow 0
+        if ($field === 'stock_quantity') {
+            if ($_POST[$field] === '' || $_POST[$field] === null) {
+                throw new Exception("Missing required field: $field");
+            }
+        } else if (empty($_POST[$field])) {
             throw new Exception("Missing required field: $field");
         }
     }
