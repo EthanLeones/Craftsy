@@ -194,7 +194,7 @@ if ($user_id) {
     .quantity-btn:hover {
         background: #f1f3f4;
         box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    }   
+    }
 
     .quantity-btn:first-child {
         border-right: none;
@@ -300,13 +300,14 @@ if ($user_id) {
         gap: 12px;
         pointer-events: none;
     }
+
     .toast {
         min-width: 220px;
         max-width: 350px;
         background: #fff;
-        color: #3f1a41;
+        color: white;
         border-radius: 8px;
-        box-shadow: 0 4px 16px rgba(63,26,65,0.18);
+        box-shadow: 0 4px 16px rgba(63, 26, 65, 0.18);
         padding: 16px 24px;
         font-size: 1em;
         font-weight: 500;
@@ -319,18 +320,31 @@ if ($user_id) {
         align-items: center;
         justify-content: space-between;
     }
-    .toast.success { color: white; border-left-color: #4bb543; }
-    .toast.error { border-left-color: #e74c3c; }
-    .toast.confirm { border-left-color: #f1c40f; }
+
+    .toast.success {
+        color: white;
+        border-left-color: #4bb543;
+    }
+
+    .toast.error {
+        border-left-color: #e74c3c;
+    }
+
+    .toast.confirm {
+        border-left-color: #f1c40f;
+    }
+
     .toast.show {
         opacity: 1;
         transform: translateY(0);
     }
+
     .toast .toast-actions {
         margin-left: 18px;
         display: flex;
         gap: 8px;
     }
+
     .toast .toast-btn {
         background: #be95c4;
         color: #fff;
@@ -342,12 +356,15 @@ if ($user_id) {
         cursor: pointer;
         transition: background 0.2s;
     }
+
     .toast .toast-btn:hover {
         background: #3f1a41;
     }
+
     .toast .toast-btn.cancel {
         background: #e74c3c;
     }
+
     .toast .toast-btn.cancel:hover {
         background: #c0392b;
     }
@@ -399,13 +416,14 @@ if ($user_id) {
             align-items: center;
             gap: 15px;
         }
-        
+
         .toast-container {
             top: 16px;
             right: 8px;
             left: 8px;
             align-items: center;
         }
+
         .toast {
             min-width: 0;
             max-width: 98vw;
@@ -539,7 +557,7 @@ if ($user_id) {
                     const quantityInput = event.target.parentNode.querySelector('.quantity-input');
                     const currentValue = parseInt(quantityInput.value);
                     const stockLimit = parseInt(quantityInput.dataset.stock);
-                    
+
                     if (currentValue < stockLimit) {
                         quantityInput.value = currentValue + 1;
                         updateQuantity(quantityInput);
