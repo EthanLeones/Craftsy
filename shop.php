@@ -38,7 +38,6 @@ if (isset($_GET['search']) && !empty(trim($_GET['search']))) {
     $sql .= " AND (name LIKE ? OR description LIKE ?)";
     $params[] = '%' . $search_query . '%';
     $params[] = '%' . $search_query . '%';
-    
 }
 
 $sql .= " ORDER BY created_at DESC";
@@ -180,6 +179,7 @@ try {
         padding: 30px 30px 30px 30px;
         margin-top: 18px;
         min-height: 400px;
+        justify-items: center;
     }
 
     .product-item {
@@ -187,16 +187,19 @@ try {
         text-align: center;
         display: flex;
         flex-direction: column;
-        justify-content: space-between;
+        justify-content: flex-start;
         cursor: pointer;
         border-radius: 0;
         background-color: #fff;
         box-shadow: none;
+        width: 100%;
+        max-width: 280px;
     }
 
 
     .product-item img {
         max-width: 100%;
+        width: 100%;
         height: 200px;
         object-fit: cover;
         border-radius: 8px;
@@ -214,9 +217,9 @@ try {
         flex-direction: column;
         align-items: center;
         font-family: 'Montserrat', Arial, sans-serif;
-        margin-top: 10px;
+        margin-top: 5px;
         margin-bottom: 0;
-        line-height: 1;
+        line-height: 1.2;
     }
 
     .product-name {
@@ -273,6 +276,11 @@ try {
             grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
             gap: 14px;
             padding: 10px 2vw;
+            justify-items: center;
+        }
+
+        .product-item {
+            max-width: 240px;
         }
 
         .product-item img {
@@ -291,17 +299,19 @@ try {
         }
 
         .product-list {
-            grid-template-columns: 1fr;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
             padding: 6px 0;
             gap: 10px;
+            justify-items: center;
         }
 
         .product-item {
             padding: 10px 4px;
+            max-width: 200px;
         }
 
         .product-item img {
-            height: 100px;
+            height: 120px;
         }
 
         .sidebar .shop-search-bar input[type="text"] {
@@ -381,12 +391,12 @@ try {
             transform: translateX(100%);
         `;
         document.body.appendChild(toast);
-        
+
         // Show toast
         setTimeout(() => {
             toast.style.transform = 'translateX(0)';
         }, 100);
-        
+
         // Hide and remove toast
         setTimeout(() => {
             toast.style.transform = 'translateX(100%)';
