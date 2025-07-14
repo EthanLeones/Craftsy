@@ -2409,12 +2409,12 @@ button:hover {
 /* Toast Notification Styles */
 
 .toast {
-    position: fixed;
-    bottom: 20px;
+    position: fixed !important;
+    bottom: 20px !important;
     right: -500px;
     /* Start further off-screen */
     background-color: #3f1a41;
-    color: white;
+    color: white !important;
     padding: 16px 24px;
     border-radius: 8px;
     font-size: 14px;
@@ -2422,17 +2422,17 @@ button:hover {
     min-width: 300px;
     max-width: 450px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-    z-index: 10001;
+    z-index: 10001 !important;
     transition: right 0.4s ease-in-out;
     letter-spacing: 0.5px;
-    display: flex;
+    display: flex !important;
     align-items: center;
     justify-content: space-between;
     word-wrap: break-word;
 }
 
 .toast.show {
-    right: 20px;
+    right: 20px !important;
     /* Slide into view */
 }
 

@@ -2,6 +2,17 @@
 $page_title = 'Homepage';
 include 'header.php';
 require_once 'includes/session.php';
+
+// Display session alerts as toast notifications
+if (isset($_SESSION['alert_message'])) {
+    echo '<script>
+        document.addEventListener("DOMContentLoaded", function() {
+            showToast("' . addslashes($_SESSION['alert_message']) . '", "' . ($_SESSION['alert_type'] ?? 'success') . '");
+        });
+    </script>';
+    unset($_SESSION['alert_message']);
+    unset($_SESSION['alert_type']);
+}
 ?>
 
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
