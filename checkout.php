@@ -522,8 +522,8 @@ Contact: <?php echo htmlspecialchars($address['contact_number']); ?></pre>
 
                 <div class="checkout-proof-upload" id="proof-of-payment-group" style="display: none;">
                     <label for="proof_of_payment">Upload Proof of Payment</label>
-                    <input type="file" id="proof_of_payment" name="proof_of_payment" accept="image/*">
-                    <small>Accepted formats: JPG, PNG, GIF</small>
+                    <input type="file" id="proof_of_payment" name="proof_of_payment" accept=".jpg,.jpeg,.png">
+                    <small>Accepted formats: JPG, PNG</small>
                 </div>
             </div>
 
@@ -577,8 +577,123 @@ Contact: <?php echo htmlspecialchars($address['contact_number']); ?></pre>
 
         const paymentMethodRadios = document.querySelectorAll('input[name="payment_method"]');
         const proofOfPaymentGroup = document.getElementById('proof-of-payment-group');
+        const proofOfPaymentInput = document.getElementById('proof_of_payment');
         const gcashInstructions = document.getElementById('gcash-instructions');
         const bpiInstructions = document.getElementById('bpi-instructions');
+        const checkoutForm = document.getElementById('checkout-form');
+
+        // Allowed file formats
+        const allowedFormats = ['image/jpeg', 'image/jpg', 'image/png'];
+        const allowedExtensions = ['jpg', 'jpeg', 'png'];
+
+        function showToast(message, type = 'error') {
+            // Create toast element
+            const toast = document.createElement('div');
+            toast.className = `toast toast-${type}`;
+            toast.style.cssText = `
+                position: fixed;
+                bottom: 20px;
+                right: 20px;
+                background: ${type === 'success' ? '#4CAF50' : '#dc3545'};
+                color: white;
+                padding: 16px 24px;
+                border-radius: 4px;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+                z-index: 9999;
+                max-width: 400px;
+                font-size: 14px;
+                line-height: 1.4;
+                opacity: 0;
+                transform: translateX(100%);
+                transition: all 0.3s ease;
+            `;
+            toast.textContent = message;
+
+            document.body.appendChild(toast);
+
+            // Trigger animation
+            setTimeout(() => {
+                toast.style.opacity = '1';
+                toast.style.transform = 'translateX(0)';
+            }, 100);
+
+            // Remove toast after 5 seconds
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transform = 'translateX(100%)';
+                setTimeout(() => {
+                    if (toast.parentNode) {
+                        toast.parentNode.removeChild(toast);
+                    }
+                }, 300);
+            }, 5000);
+        }
+
+        function validateFileFormat(file) {
+            if (!file) return true; // No file selected is valid
+
+            const fileType = file.type;
+            const fileName = file.name.toLowerCase();
+            const fileExtension = fileName.split('.').pop();
+
+            // Check both MIME type and file extension
+            const isValidMimeType = allowedFormats.includes(fileType);
+            const isValidExtension = allowedExtensions.includes(fileExtension);
+
+            return isValidMimeType && isValidExtension;
+        }
+
+        function clearFileInput() {
+            if (proofOfPaymentInput) {
+                proofOfPaymentInput.value = '';
+            }
+        }
+
+        // File input validation
+        if (proofOfPaymentInput) {
+            proofOfPaymentInput.addEventListener('change', function(e) {
+                const file = e.target.files[0];
+
+                if (file && !validateFileFormat(file)) {
+                    showToast('Invalid file format. Please upload only JPG or PNG files.', 'error');
+                    clearFileInput();
+                    return false;
+                }
+            });
+        }
+
+        // Form submission validation
+        if (checkoutForm) {
+            checkoutForm.addEventListener('submit', function(e) {
+                const selectedPaymentMethod = document.querySelector('input[name="payment_method"]:checked');
+
+                if (selectedPaymentMethod && (selectedPaymentMethod.value === 'bank_transfer' || selectedPaymentMethod.value === 'gcash')) {
+                    const file = proofOfPaymentInput ? proofOfPaymentInput.files[0] : null;
+
+                    if (!file) {
+                        e.preventDefault();
+                        showToast('Please upload proof of payment for the selected payment method.', 'error');
+                        return false;
+                    }
+
+                    if (!validateFileFormat(file)) {
+                        e.preventDefault();
+                        showToast('Invalid file format. Please upload only JPG or PNG files.', 'error');
+                        clearFileInput();
+                        return false;
+                    }
+
+                    // Check file size (optional - max 5MB)
+                    const maxSize = 5 * 1024 * 1024; // 5MB in bytes
+                    if (file.size > maxSize) {
+                        e.preventDefault();
+                        showToast('File size too large. Please upload a file smaller than 5MB.', 'error');
+                        clearFileInput();
+                        return false;
+                    }
+                }
+            });
+        }
 
         function toggleProofOfPayment() {
             const selectedMethod = document.querySelector('input[name="payment_method"]:checked');
@@ -589,8 +704,17 @@ Contact: <?php echo htmlspecialchars($address['contact_number']); ?></pre>
             if (proofOfPaymentGroup) {
                 if (methodValue === 'bank_transfer' || methodValue === 'gcash') {
                     proofOfPaymentGroup.style.display = 'block';
+                    // Make file input required for these payment methods
+                    if (proofOfPaymentInput) {
+                        proofOfPaymentInput.setAttribute('required', 'required');
+                    }
                 } else {
                     proofOfPaymentGroup.style.display = 'none';
+                    // Remove required attribute for COD
+                    if (proofOfPaymentInput) {
+                        proofOfPaymentInput.removeAttribute('required');
+                        clearFileInput(); // Clear file when switching to COD
+                    }
                 }
             }
 
