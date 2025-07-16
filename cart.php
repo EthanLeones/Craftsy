@@ -331,7 +331,9 @@ if ($user_id) {
     }
 
     .toast.confirm {
-        border-left-color: #f1c40f;
+        border-left-color: #ff6b35;
+        background: #fff5f2;
+        color: #d63031;
     }
 
     .toast.show {
