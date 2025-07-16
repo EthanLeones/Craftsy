@@ -13,11 +13,12 @@ $orders = [];
 try {
     $conn = getDBConnection();
 
-    // Get orders with their items and product details
+    // Get orders with their items and product details - ensure one row per order
     $stmt_orders = $conn->prepare("
-        SELECT DISTINCT o.id, o.order_date, o.total_amount, o.status 
+        SELECT o.id, o.order_date, o.total_amount, o.status 
         FROM orders o 
-        WHERE o.user_id = ? 
+        WHERE o.user_id = ? AND (o.is_deleted = 0 OR o.is_deleted IS NULL)
+        GROUP BY o.id
         ORDER BY o.order_date DESC
     ");
     $stmt_orders->execute([$user_id]);
@@ -25,22 +26,23 @@ try {
 
     // Get order items for each order
     foreach ($orders as &$order) {
+        // Get first 3 order items for preview
         $stmt_items = $conn->prepare("
-            SELECT oi.*, p.name, p.image_url, p.price 
+            SELECT oi.product_id, oi.quantity, oi.price_at_time as price, p.name, p.image_url 
             FROM order_items oi 
             JOIN products p ON oi.product_id = p.id 
             WHERE oi.order_id = ? 
+            ORDER BY oi.id
             LIMIT 3
         ");
         $stmt_items->execute([$order['id']]);
         $order['items'] = $stmt_items->fetchAll(PDO::FETCH_ASSOC);
-        
+
         // Count total items in order
-        $stmt_count = $conn->prepare("SELECT COUNT(*) as total_items FROM order_items WHERE order_id = ?");
+        $stmt_count = $conn->prepare("SELECT COUNT(*) FROM order_items WHERE order_id = ?");
         $stmt_count->execute([$order['id']]);
         $order['total_items'] = $stmt_count->fetchColumn();
     }
-
 } catch (PDOException $e) {
     error_log("Error fetching order history: " . $e->getMessage());
     $_SESSION['alert'] = ['type' => 'danger', 'message' => 'An error occurred while loading your order history.'];
@@ -317,61 +319,61 @@ try {
     }
 </style>
 
-        <h1 class="order-history-title">My Order History</h1>
+<h1 class="order-history-title">My Order History</h1>
 
-        <div class="order-history-page">
-            <?php if (empty($orders)): ?>
-                <div class="empty-orders">
-                    <h2>No Orders Yet</h2>
-                    <p>You haven't placed any orders yet. Start exploring our collection!</p>
-                    <a href="shop.php" class="order-btn">Start Shopping</a>
-                </div>
-            <?php else: ?>
-                <div class="orders-grid">
-                    <?php foreach ($orders as $order): ?>
-                        <div class="order-card">
-                            <div class="order-header">
-                                <div class="order-info">
-                                    <div class="order-id">Order #<?php echo htmlspecialchars($order['id']); ?></div>
-                                    <div class="order-date"><?php echo htmlspecialchars((new DateTime($order['order_date']))->format('F j, Y \a\t g:i A')); ?></div>
-                                    <div class="order-total">P<?php echo htmlspecialchars(number_format($order['total_amount'], 2)); ?></div>
-                                </div>
-                                <div class="order-status status-<?php echo strtolower(str_replace(' ', '-', $order['status'])); ?>">
-                                    <?php echo htmlspecialchars($order['status']); ?>
-                                </div>
-                            </div>
+<div class="order-history-page">
+    <?php if (empty($orders)): ?>
+        <div class="empty-orders">
+            <h2>No Orders Yet</h2>
+            <p>You haven't placed any orders yet. Start exploring our collection!</p>
+            <a href="shop.php" class="order-btn">Start Shopping</a>
+        </div>
+    <?php else: ?>
+        <div class="orders-grid">
+            <?php foreach ($orders as $order): ?>
+                <div class="order-card">
+                    <div class="order-header">
+                        <div class="order-info">
+                            <div class="order-id">Order #<?php echo htmlspecialchars($order['id']); ?></div>
+                            <div class="order-date"><?php echo htmlspecialchars((new DateTime($order['order_date']))->format('F j, Y \a\t g:i A')); ?></div>
+                            <div class="order-total">P<?php echo htmlspecialchars(number_format($order['total_amount'], 2)); ?></div>
+                        </div>
+                        <div class="order-status status-<?php echo strtolower(str_replace(' ', '-', $order['status'])); ?>">
+                            <?php echo htmlspecialchars($order['status']); ?>
+                        </div>
+                    </div>
 
-                            <?php if (!empty($order['items'])): ?>
-                                <div class="order-items">
-                                    <?php foreach (array_slice($order['items'], 0, 3) as $item): ?>
-                                        <div class="order-item-preview">
-                                            <img src="<?php echo htmlspecialchars($item['image_url'] ?? 'images/placeholder.png'); ?>" 
-                                                 alt="<?php echo htmlspecialchars($item['name']); ?>" 
-                                                 class="item-image">
-                                            <div class="item-details">
-                                                <div class="item-name"><?php echo htmlspecialchars($item['name']); ?></div>
-                                                <div class="item-quantity">Qty: <?php echo htmlspecialchars($item['quantity']); ?></div>
-                                            </div>
-                                        </div>
-                                    <?php endforeach; ?>
-                                    
-                                    <?php if ($order['total_items'] > 3): ?>
-                                        <div class="more-items">
-                                            +<?php echo ($order['total_items'] - 3); ?> more
-                                        </div>
-                                    <?php endif; ?>
+                    <?php if (!empty($order['items'])): ?>
+                        <div class="order-items">
+                            <?php foreach (array_slice($order['items'], 0, 3) as $item): ?>
+                                <div class="order-item-preview">
+                                    <img src="<?php echo htmlspecialchars($item['image_url'] ?? 'images/placeholder.png'); ?>"
+                                        alt="<?php echo htmlspecialchars($item['name']); ?>"
+                                        class="item-image">
+                                    <div class="item-details">
+                                        <div class="item-name"><?php echo htmlspecialchars($item['name']); ?></div>
+                                        <div class="item-quantity">Qty: <?php echo htmlspecialchars($item['quantity']); ?></div>
+                                    </div>
+                                </div>
+                            <?php endforeach; ?>
+
+                            <?php if ($order['total_items'] > 3): ?>
+                                <div class="more-items">
+                                    +<?php echo ($order['total_items'] - 3); ?> more
                                 </div>
                             <?php endif; ?>
-
-                            <div class="order-actions">
-                                <a href="order_details.php?order_id=<?php echo htmlspecialchars($order['id']); ?>" 
-                                   class="order-btn order-btn-secondary">View Details</a>
-                            </div>
                         </div>
-                    <?php endforeach; ?>
+                    <?php endif; ?>
+
+                    <div class="order-actions">
+                        <a href="order_details.php?order_id=<?php echo htmlspecialchars($order['id']); ?>"
+                            class="order-btn order-btn-secondary">View Details</a>
+                    </div>
                 </div>
-            <?php endif; ?>
+            <?php endforeach; ?>
         </div>
+    <?php endif; ?>
+</div>
 
 </div> <!-- Close container from header.php -->
 
@@ -379,4 +381,4 @@ try {
 
 <?php
 
-?> 
+?>

@@ -5,6 +5,19 @@ require_once 'config/database.php';
 requireLogin(); 
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    // Prevent duplicate form submissions
+    $form_token = $_POST['form_token'] ?? '';
+    $session_token = $_SESSION['form_token'] ?? '';
+    
+    if (empty($form_token) || $form_token !== $session_token) {
+        $_SESSION['alert'] = ['type' => 'danger', 'message' => 'Invalid form submission. Please try again.'];
+        header('Location: checkout.php?error=invalid_token');
+        exit();
+    }
+    
+    // Clear the token to prevent reuse
+    unset($_SESSION['form_token']);
+    
     $user_id = getCurrentUserId();
     $shipping_address_id = $_POST['shipping_address'] ?? null;
     $payment_method = $_POST['payment_method'] ?? null;
@@ -62,7 +75,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     try {
         $conn = getDBConnection();
+        
+        // Start transaction with proper isolation level to prevent race conditions
         $conn->beginTransaction();
+        
+        // Lock the user's cart to prevent concurrent modifications
+        $stmt_lock = $conn->prepare("SELECT 1 FROM cart WHERE user_id = ? FOR UPDATE");
+        $stmt_lock->execute([$user_id]);
 
         $stmt_cart = $conn->prepare("SELECT c.*, p.name, p.price FROM cart c JOIN products p ON c.product_id = p.id WHERE c.user_id = ?");
         $stmt_cart->execute([$user_id]);

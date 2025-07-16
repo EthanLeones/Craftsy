@@ -98,7 +98,7 @@ try {
         JOIN orders o ON oi.order_id = o.id 
         WHERE o.order_date >= ? AND p.active = 1 AND o.status != 'cancelled'
         GROUP BY p.id 
-        ORDER BY revenue DESC 
+        ORDER BY sold_count DESC 
         LIMIT 5
     ");
     $stmt_top_selling->execute([$thirty_days_ago]);

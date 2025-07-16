@@ -10,38 +10,71 @@ $user_id = getCurrentUserId();
 
 if ($user_id) {
     try {
-        $conn = getDBConnection();
-
-        // Get orders with their items and product details
+        $conn = getDBConnection();        // Get orders for the user - ensure we only get one row per order
         $stmt = $conn->prepare("
-            SELECT DISTINCT o.id, o.order_date, o.total_amount, o.status, o.created_at 
+            SELECT o.id, o.order_date, o.total_amount, o.status, o.created_at 
             FROM orders o 
-            WHERE o.user_id = ? 
+            WHERE o.user_id = ? AND (o.is_deleted = 0 OR o.is_deleted IS NULL)
+            GROUP BY o.id
             ORDER BY o.created_at DESC
         ");
         $stmt->execute([$user_id]);
-        $orders = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        $raw_orders = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-        // Get order items for each order
-        foreach ($orders as &$order) {
+        // Debug: Log final results
+        error_log("FINAL orders count: " . count($raw_orders));
+        foreach ($raw_orders as $order) {
+            error_log("Order ID: " . $order['id'] . " - Status: " . $order['status'] . " - Total: " . $order['total_amount']);
+        }
+
+        // Get order items for each order - avoid reference issues
+        $orders = [];
+        foreach ($raw_orders as $order_data) {
+            // Create a fresh copy of order data
+            $order = [
+                'id' => $order_data['id'],
+                'order_date' => $order_data['order_date'],
+                'total_amount' => $order_data['total_amount'],
+                'status' => $order_data['status'],
+                'created_at' => $order_data['created_at']
+            ];
+
+            // Debug: Log which order we're processing
+            error_log("Processing Order ID: " . $order['id'] . " with total: " . $order['total_amount']);
+
+            // Get order items - fixed query to prevent potential JOIN issues
             $stmt_items = $conn->prepare("
-                SELECT oi.*, p.name, p.image_url, p.price 
+                SELECT oi.product_id, oi.quantity, oi.price_at_time as price, p.name, p.image_url 
                 FROM order_items oi 
-                JOIN products p ON oi.product_id = p.id 
+                INNER JOIN products p ON oi.product_id = p.id 
                 WHERE oi.order_id = ? 
-                LIMIT 3
+                ORDER BY oi.id
             ");
             $stmt_items->execute([$order['id']]);
             $order['items'] = $stmt_items->fetchAll(PDO::FETCH_ASSOC);
-            
-            // Count total items in order
-            $stmt_count = $conn->prepare("SELECT COUNT(*) as total_items FROM order_items WHERE order_id = ?");
-            $stmt_count->execute([$order['id']]);
-            $order['total_items'] = $stmt_count->fetchColumn();
-        }
 
+            // Debug: Log what items we found
+            error_log("Order " . $order['id'] . " items found: " . count($order['items']));
+            foreach ($order['items'] as $item) {
+                error_log("  - Product ID: " . $item['product_id'] . ", Name: " . $item['name'] . ", Qty: " . $item['quantity']);
+            }
+
+            // Count total items in order - simple and safe query
+            $stmt_count = $conn->prepare("SELECT COUNT(*) FROM order_items WHERE order_id = ?");
+            $stmt_count->execute([$order['id']]);
+            $order['total_items'] = (int)$stmt_count->fetchColumn();
+
+            // Debug log for each order
+            error_log("Order ID: " . $order['id'] . " has " . $order['total_items'] . " items, fetched " . count($order['items']) . " item details");
+
+            // Add to final orders array
+            $orders[] = $order;
+        }
     } catch (PDOException $e) {
         error_log("Error fetching user orders: " . $e->getMessage());
+        error_log("SQL Error Code: " . $e->getCode());
+        error_log("User ID: " . $user_id);
+        // Keep $orders as empty array to show no orders message
     }
 }
 
@@ -135,28 +168,33 @@ if ($user_id) {
     }
 
     .status-pending {
-        background: #fff3cd;
-        color: #856404;
+        background: #fef3c7;
+        color: #d97706;
     }
 
     .status-processing {
-        background: #d1ecf1;
-        color: #0c5460;
+        background: #dbeafe;
+        color: #2563eb;
+    }
+
+    .status-shipping {
+        background: #b8daff;
+        color: #004085;
     }
 
     .status-shipped {
-        background: #d4edda;
-        color: #155724;
+        background: #d1fae5;
+        color: #059669;
     }
 
     .status-delivered {
-        background: #d4edda;
-        color: #155724;
+        background: #dcfce7;
+        color: #16a34a;
     }
 
     .status-cancelled {
-        background: #f8d7da;
-        color: #721c24;
+        background: #fee2e2;
+        color: #dc2626;
     }
 
     .order-items {
@@ -334,9 +372,9 @@ if ($user_id) {
                             <div class="order-info">
                                 <div class="order-id">Order #<?php echo htmlspecialchars($order['id']); ?></div>
                                 <div class="order-date">
-                                    <?php 
+                                    <?php
                                     $order_date = $order['order_date'] ?? $order['created_at'];
-                                    echo htmlspecialchars((new DateTime($order_date))->format('F j, Y \a\t g:i A')); 
+                                    echo htmlspecialchars((new DateTime($order_date))->format('F j, Y \a\t g:i A'));
                                     ?>
                                 </div>
                                 <div class="order-total">P<?php echo htmlspecialchars(number_format($order['total_amount'], 2)); ?></div>
@@ -350,16 +388,16 @@ if ($user_id) {
                             <div class="order-items">
                                 <?php foreach (array_slice($order['items'], 0, 3) as $item): ?>
                                     <div class="order-item-preview">
-                                        <img src="<?php echo htmlspecialchars($item['image_url'] ?? 'images/placeholder.png'); ?>" 
-                                             alt="<?php echo htmlspecialchars($item['name']); ?>" 
-                                             class="item-image">
+                                        <img src="<?php echo htmlspecialchars($item['image_url'] ?? 'images/placeholder.png'); ?>"
+                                            alt="<?php echo htmlspecialchars($item['name']); ?>"
+                                            class="item-image">
                                         <div class="item-details">
                                             <div class="item-name"><?php echo htmlspecialchars($item['name']); ?></div>
                                             <div class="item-quantity">Qty: <?php echo htmlspecialchars($item['quantity']); ?></div>
                                         </div>
                                     </div>
                                 <?php endforeach; ?>
-                                
+
                                 <?php if ($order['total_items'] > 3): ?>
                                     <div class="more-items">
                                         +<?php echo ($order['total_items'] - 3); ?> more
@@ -369,8 +407,8 @@ if ($user_id) {
                         <?php endif; ?>
 
                         <div class="order-actions">
-                            <a href="order_details.php?order_id=<?php echo htmlspecialchars($order['id']); ?>" 
-                               class="order-btn order-btn-secondary">View Details</a>
+                            <a href="order_details.php?order_id=<?php echo htmlspecialchars($order['id']); ?>"
+                                class="order-btn order-btn-secondary">View Details</a>
                         </div>
                     </div>
                 <?php endforeach; ?>
@@ -382,16 +420,16 @@ if ($user_id) {
 </div> <!-- Close container from header.php -->
 
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    // Handle session alerts with toast notifications
-    <?php
-    if (isset($_SESSION['alert'])) {
-        $alert = $_SESSION['alert'];
-        unset($_SESSION['alert']);
-        echo "showToast('" . addslashes($alert['message']) . "', '" . ($alert['type'] === 'success' ? 'success' : 'error') . "');";
-    }
-    ?>
-});
+    document.addEventListener('DOMContentLoaded', function() {
+        // Handle session alerts with toast notifications
+        <?php
+        if (isset($_SESSION['alert'])) {
+            $alert = $_SESSION['alert'];
+            unset($_SESSION['alert']);
+            echo "showToast('" . addslashes($alert['message']) . "', '" . ($alert['type'] === 'success' ? 'success' : 'error') . "');";
+        }
+        ?>
+    });
 </script>
 
-<?php include 'footer.php'; ?> 
+<?php include 'footer.php'; ?>

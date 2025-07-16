@@ -10,6 +10,11 @@ $total_amount = 0;
 $user_addresses = [];
 $user_id = getCurrentUserId();
 
+// Generate form token to prevent duplicate submissions
+if (!isset($_SESSION['form_token'])) {
+    $_SESSION['form_token'] = bin2hex(random_bytes(32));
+}
+
 if ($user_id) {
     try {
         $conn = getDBConnection();
@@ -476,6 +481,7 @@ if ($user_id) {
     <h1 class="checkout-page-title">Checkout</h1>
 
     <form id="checkout-form" action="place_order.php" method="post" enctype="multipart/form-data">
+        <input type="hidden" name="form_token" value="<?php echo htmlspecialchars($_SESSION['form_token']); ?>">
         <div class="checkout-main-container">
             <div class="checkout-shipping-section">
                 <h2 class="checkout-section-title">Shipping Address</h2>
@@ -664,7 +670,15 @@ Contact: <?php echo htmlspecialchars($address['contact_number']); ?></pre>
 
         // Form submission validation
         if (checkoutForm) {
+            let isSubmitting = false; // Prevent double submission
+            
             checkoutForm.addEventListener('submit', function(e) {
+                // Prevent double submission
+                if (isSubmitting) {
+                    e.preventDefault();
+                    return false;
+                }
+                
                 const selectedPaymentMethod = document.querySelector('input[name="payment_method"]:checked');
 
                 if (selectedPaymentMethod && (selectedPaymentMethod.value === 'bank_transfer' || selectedPaymentMethod.value === 'gcash')) {
@@ -678,7 +692,7 @@ Contact: <?php echo htmlspecialchars($address['contact_number']); ?></pre>
 
                     if (!validateFileFormat(file)) {
                         e.preventDefault();
-                        showToast('Invalid file format. Please upload only JPG or PNG files.', 'error');
+                        showToast('Please upload proof of payment for the selected payment method.', 'error');
                         clearFileInput();
                         return false;
                     }
@@ -691,6 +705,14 @@ Contact: <?php echo htmlspecialchars($address['contact_number']); ?></pre>
                         clearFileInput();
                         return false;
                     }
+                }
+                
+                // Mark as submitting and disable submit button
+                isSubmitting = true;
+                const submitBtn = document.querySelector('button[type="submit"]');
+                if (submitBtn) {
+                    submitBtn.disabled = true;
+                    submitBtn.textContent = 'Processing...';
                 }
             });
         }
