@@ -148,11 +148,7 @@ CREATE TABLE `users` (
 --
 
 INSERT INTO `users` (`id`, `username`, `name`, `email`, `password`, `role`, `created_at`, `updated_at`) VALUES
-(1, 'admin', 'Admin', 'admin@craftsynook.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'admin', '2025-05-26 15:22:20', '2025-07-08 01:01:12'),
-(2, 'Inakoy', 'Vicente Inaki Villa', 'inaki.villa13@gmail.com', '$2y$10$yHHDxITcluaJMs7pAR8nk.Nil8TDFJH/79.ri6iMJdFepTiRNZPNe', 'customer', '2025-05-26 17:49:07', '2025-05-26 17:49:07'),
-(3, 'gwapo', 'Rolando gwapo Villa', 'gwapo@gmail.com', '$2y$10$xtMddKyejvuLdFbn0DJhwO.LWrfTOWQyI3AGmESHojlaql.3ORTGi', 'customer', '2025-05-27 01:09:56', '2025-07-08 00:55:35'),
-(6, 'asstone', 'Inaki', 'aa@example.com', '$2y$10$JrdWVXTCCg5bOcXyLwQmp.AO7nBpfavt1Sj4XtTlCvvA2kt37G0Dy', 'customer', '2025-07-08 01:02:10', '2025-07-08 01:02:10'),
-(7, 'test', 'test', 'test@test.com', '$2y$10$YTS5P5/JEyjeklpiEqvGguDe63pwuiHDjFcJnk644RbpCweh1WuWa', 'customer', '2025-07-08 13:37:11', '2025-07-08 13:37:11');
+(1, 'admin', 'Admin', 'admin@craftsynook.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'admin', '2025-05-26 15:22:20', '2025-07-08 01:01:12');
 
 -- --------------------------------------------------------
 
