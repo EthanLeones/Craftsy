@@ -13,9 +13,15 @@ try {
     $sort = $_GET['sort'] ?? '';
     $search = $_GET['search'] ?? '';
 
-    $whereClause = 'active = 1';
     $orderBy = 'created_at DESC';
     $searchParams = [];
+    $countParams = [];
+    $productsParams = [];
+
+    // Determine active status based on sort
+    $activeStatus = ($sort === 'is_active') ? 0 : 1;
+    $whereClause = 'active = ?';
+    $baseParams = [$activeStatus];
 
     // Handle search
     if (!empty($search)) {
@@ -23,6 +29,10 @@ try {
         $searchParam = '%' . $search . '%';
         $searchParams = [$searchParam, $searchParam, $searchParam];
     }
+
+    // Combine base params with search params
+    $countParams = array_merge($baseParams, $searchParams);
+    $productsParams = array_merge($baseParams, $searchParams);
 
     switch ($sort) {
         case 'in_stock_true':
@@ -32,7 +42,6 @@ try {
             $orderBy = 'stock_quantity ASC';
             break;
         case 'is_active':
-            $whereClause = str_replace('active = 1', 'active = 0', $whereClause);
             $orderBy = 'id ASC';
             break;
         case 'name_asc':
@@ -51,27 +60,42 @@ try {
 
     // Get total count for pagination
     $countQuery = "SELECT COUNT(*) FROM products WHERE $whereClause";
-    if (!empty($searchParams)) {
-        $stmt_total = $conn->prepare($countQuery);
-        $stmt_total->execute($searchParams);
-    } else {
-        $stmt_total = $conn->query($countQuery);
+    $stmt_total = $conn->prepare($countQuery);
+
+    // Bind parameters for count query
+    foreach ($countParams as $index => $param) {
+        if ($index === 0) {
+            // First parameter is always the active status (integer)
+            $stmt_total->bindValue($index + 1, $param, PDO::PARAM_INT);
+        } else {
+            // Search parameters are strings
+            $stmt_total->bindValue($index + 1, $param, PDO::PARAM_STR);
+        }
     }
+
+    $stmt_total->execute();
     $totalResults = $stmt_total->fetchColumn();
     $totalPages = ceil($totalResults / $limit);
 
     // Get products
-    $productsQuery = "SELECT * FROM products WHERE $whereClause ORDER BY $orderBy LIMIT :limit OFFSET :offset";
+    $productsQuery = "SELECT * FROM products WHERE $whereClause ORDER BY $orderBy LIMIT ? OFFSET ?";
     $stmt_products = $conn->prepare($productsQuery);
 
-    if (!empty($searchParams)) {
-        foreach ($searchParams as $index => $param) {
+    // Bind search and filter parameters
+    foreach ($productsParams as $index => $param) {
+        if ($index === 0) {
+            // First parameter is always the active status (integer)
+            $stmt_products->bindValue($index + 1, $param, PDO::PARAM_INT);
+        } else {
+            // Search parameters are strings
             $stmt_products->bindValue($index + 1, $param, PDO::PARAM_STR);
         }
     }
 
-    $stmt_products->bindValue(':limit', $limit, PDO::PARAM_INT);
-    $stmt_products->bindValue(':offset', $offset, PDO::PARAM_INT);
+    // Bind pagination parameters (continue the index sequence)
+    $nextIndex = count($productsParams) + 1;
+    $stmt_products->bindValue($nextIndex, $limit, PDO::PARAM_INT);
+    $stmt_products->bindValue($nextIndex + 1, $offset, PDO::PARAM_INT);
     $stmt_products->execute();
     $products = $stmt_products->fetchAll(PDO::FETCH_ASSOC);
     $categories = [
