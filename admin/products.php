@@ -11,8 +11,19 @@ try {
     $limit = 10;
     $offset = ($page - 1) * $limit;
     $sort = $_GET['sort'] ?? '';
+    $search = $_GET['search'] ?? '';
+
     $whereClause = 'active = 1';
     $orderBy = 'created_at DESC';
+    $searchParams = [];
+
+    // Handle search
+    if (!empty($search)) {
+        $whereClause .= ' AND (name LIKE ? OR category LIKE ? OR description LIKE ?)';
+        $searchParam = '%' . $search . '%';
+        $searchParams = [$searchParam, $searchParam, $searchParam];
+    }
+
     switch ($sort) {
         case 'in_stock_true':
             $orderBy = 'stock_quantity DESC';
@@ -21,19 +32,44 @@ try {
             $orderBy = 'stock_quantity ASC';
             break;
         case 'is_active':
-            $whereClause = 'active = 0';
+            $whereClause = str_replace('active = 1', 'active = 0', $whereClause);
             $orderBy = 'id ASC';
             break;
+        case 'name_asc':
+            $orderBy = 'name ASC';
+            break;
+        case 'name_desc':
+            $orderBy = 'name DESC';
+            break;
+        case 'price_asc':
+            $orderBy = 'price ASC';
+            break;
+        case 'price_desc':
+            $orderBy = 'price DESC';
+            break;
     }
-    $stmt_total = $conn->query("SELECT COUNT(*) FROM products WHERE $whereClause");
+
+    // Get total count for pagination
+    $countQuery = "SELECT COUNT(*) FROM products WHERE $whereClause";
+    if (!empty($searchParams)) {
+        $stmt_total = $conn->prepare($countQuery);
+        $stmt_total->execute($searchParams);
+    } else {
+        $stmt_total = $conn->query($countQuery);
+    }
     $totalResults = $stmt_total->fetchColumn();
     $totalPages = ceil($totalResults / $limit);
-    $stmt_products = $conn->prepare("
-        SELECT * FROM products 
-        WHERE $whereClause
-        ORDER BY $orderBy 
-        LIMIT :limit OFFSET :offset
-    ");
+
+    // Get products
+    $productsQuery = "SELECT * FROM products WHERE $whereClause ORDER BY $orderBy LIMIT :limit OFFSET :offset";
+    $stmt_products = $conn->prepare($productsQuery);
+
+    if (!empty($searchParams)) {
+        foreach ($searchParams as $index => $param) {
+            $stmt_products->bindValue($index + 1, $param, PDO::PARAM_STR);
+        }
+    }
+
     $stmt_products->bindValue(':limit', $limit, PDO::PARAM_INT);
     $stmt_products->bindValue(':offset', $offset, PDO::PARAM_INT);
     $stmt_products->execute();
@@ -66,15 +102,55 @@ try {
             </div>
             <div class="filter-section">
                 <div class="filter-group">
+                    <label for="search" class="filter-label">Search:</label>
+                    <input type="text" id="search" name="search" class="filter-input" placeholder="Search products..." value="<?= htmlspecialchars($search) ?>">
+                </div>
+                <div class="filter-group">
                     <label for="sort" class="filter-label">Sort by:</label>
                     <select id="sort" name="sort" class="filter-select">
-                        <option value="">-- Select --</option>
-                        <option value="in_stock_true" <?= ($sort === 'in_stock_true') ? 'selected' : '' ?>>In Stock (High to Low)</option>
-                        <option value="in_stock_false" <?= ($sort === 'in_stock_false') ? 'selected' : '' ?>>In Stock (Low to High)</option>
+                        <option value="">-- Latest First --</option>
+                        <option value="name_asc" <?= ($sort === 'name_asc') ? 'selected' : '' ?>>Name (A-Z)</option>
+                        <option value="name_desc" <?= ($sort === 'name_desc') ? 'selected' : '' ?>>Name (Z-A)</option>
+                        <option value="price_asc" <?= ($sort === 'price_asc') ? 'selected' : '' ?>>Price (Low to High)</option>
+                        <option value="price_desc" <?= ($sort === 'price_desc') ? 'selected' : '' ?>>Price (High to Low)</option>
+                        <option value="in_stock_true" <?= ($sort === 'in_stock_true') ? 'selected' : '' ?>>Stock (High to Low)</option>
+                        <option value="in_stock_false" <?= ($sort === 'in_stock_false') ? 'selected' : '' ?>>Stock (Low to High)</option>
                         <option value="is_active" <?= ($sort === 'is_active') ? 'selected' : '' ?>>Inactive Products</option>
                     </select>
                 </div>
+                <div class="filter-group">
+                    <button type="button" id="clear-filters" class="button small">Clear Filters</button>
+                </div>
             </div>
+
+            <?php if (!empty($search) || !empty($sort)): ?>
+                <div class="search-results-info">
+                    <p>
+                        <?php if (!empty($search)): ?>
+                            Showing <?= $totalResults ?> result(s) for "<strong><?= htmlspecialchars($search) ?></strong>"
+                        <?php else: ?>
+                            Showing <?= $totalResults ?> result(s)
+                        <?php endif; ?>
+                        <?php if (!empty($sort)): ?>
+                            - Sorted by: <strong>
+                                <?php
+                                $sortLabels = [
+                                    'name_asc' => 'Name (A-Z)',
+                                    'name_desc' => 'Name (Z-A)',
+                                    'price_asc' => 'Price (Low to High)',
+                                    'price_desc' => 'Price (High to Low)',
+                                    'in_stock_true' => 'Stock (High to Low)',
+                                    'in_stock_false' => 'Stock (Low to High)',
+                                    'is_active' => 'Inactive Products'
+                                ];
+                                echo $sortLabels[$sort] ?? 'Latest First';
+                                ?>
+                            </strong>
+                        <?php endif; ?>
+                    </p>
+                </div>
+            <?php endif; ?>
+
             <div class="admin-table-container">
                 <table class="admin-table">
                     <thead>
@@ -98,7 +174,11 @@ try {
                             </tr>
                         <?php else: ?>
                             <?php foreach ($products as $product): ?>
-                                <tr class="table-row <?php echo ($product['stock_quantity'] <= 5) ? 'low-stock-row' : ''; ?>">
+                                <tr class="table-row <?php
+                                                        if ($product['stock_quantity'] == 0) echo 'out-of-stock-row';
+                                                        elseif ($product['stock_quantity'] <= 5) echo 'low-stock-row';
+                                                        elseif ($product['stock_quantity'] <= 15) echo 'warning-stock-row';
+                                                        ?>">
                                     <td>
                                         <div class="product-info-cell">
                                             <img src="../<?php echo htmlspecialchars($product['image_url'] ?? 'images/logo.jpg'); ?>" alt="<?php echo htmlspecialchars($product['name']); ?>" class="product-thumbnail">
@@ -106,7 +186,12 @@ try {
                                         </div>
                                     </td>
                                     <td>P<?php echo htmlspecialchars(number_format($product['price'], 2)); ?></td>
-                                    <td><span class="stock-badge <?php echo ($product['stock_quantity'] <= 5) ? 'low-stock' : 'in-stock'; ?>" id="stock-display-<?php echo $product['id']; ?>"><?php echo htmlspecialchars($product['stock_quantity']); ?></span></td>
+                                    <td><span class="stock-badge <?php
+                                                                    if ($product['stock_quantity'] == 0) echo 'out-of-stock';
+                                                                    elseif ($product['stock_quantity'] <= 5) echo 'low-stock';
+                                                                    elseif ($product['stock_quantity'] <= 15) echo 'warning-stock';
+                                                                    else echo 'in-stock';
+                                                                    ?>" id="stock-display-<?php echo $product['id']; ?>"><?php echo htmlspecialchars($product['stock_quantity']); ?></span></td>
                                     <td><span class="category-badge"><?php echo htmlspecialchars($product['category'] ?? 'N/A'); ?></span></td>
                                     <td><?php echo htmlspecialchars($product['updated_at'] ?? $product['created_at']); ?></td>
                                     <td>
@@ -126,8 +211,14 @@ try {
                 </table>
                 <?php if ($totalPages > 1): ?>
                     <div class="pagination-container">
+                        <?php
+                        $queryParams = [];
+                        if ($sort) $queryParams['sort'] = $sort;
+                        if ($search) $queryParams['search'] = $search;
+                        $queryString = !empty($queryParams) ? '&' . http_build_query($queryParams) : '';
+                        ?>
                         <?php for ($i = 1; $i <= $totalPages; $i++): ?>
-                            <a href="?page=<?= $i ?>&sort=<?= urlencode($sort) ?>" class="pagination-link <?= ($page == $i) ? 'active' : '' ?>">
+                            <a href="?page=<?= $i ?><?= $queryString ?>" class="pagination-link <?= ($page == $i) ? 'active' : '' ?>">
                                 <?= $i ?>
                             </a>
                         <?php endfor; ?>
@@ -286,15 +377,15 @@ try {
                 const productId = this.getAttribute('data-id');
                 const currentStock = this.getAttribute('data-current-stock');
                 const productName = this.getAttribute('data-product-name');
-                
+
                 console.log('Update stock for product ID:', productId);
-                
+
                 // Populate the modal
                 document.getElementById('update_product_id').value = productId;
                 document.getElementById('product_name_display').value = productName;
                 document.getElementById('current_stock_display').value = currentStock;
                 document.getElementById('new_stock_quantity').value = currentStock;
-                
+
                 // Show the modal
                 updateStockModal.style.display = 'block';
                 document.getElementById('new_stock_quantity').focus();
@@ -305,54 +396,60 @@ try {
         if (updateStockForm) {
             updateStockForm.addEventListener('submit', function(e) {
                 e.preventDefault();
-                
+
                 const formData = new FormData(this);
                 const submitButton = this.querySelector('button[type="submit"]');
                 const productId = formData.get('product_id');
                 const newStock = formData.get('stock_quantity');
-                
+
                 setButtonLoading(submitButton, true);
-                
+
                 fetch('process_update_stock.php', {
-                    method: 'POST',
-                    body: formData
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        showToast(data.message, 'success');
-                        
-                        // Update the stock display in the table
-                        const stockDisplay = document.getElementById('stock-display-' + productId);
-                        if (stockDisplay) {
-                            stockDisplay.textContent = newStock;
-                            
-                            // Update the stock badge class
-                            stockDisplay.className = 'stock-badge ' + (newStock <= 5 ? 'low-stock' : 'in-stock');
+                        method: 'POST',
+                        body: formData
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            showToast(data.message, 'success');
+
+                            // Update the stock display in the table
+                            const stockDisplay = document.getElementById('stock-display-' + productId);
+                            if (stockDisplay) {
+                                stockDisplay.textContent = newStock;
+
+                                // Update the stock badge class
+                                let stockClass = 'stock-badge ';
+                                if (newStock == 0) stockClass += 'out-of-stock';
+                                else if (newStock <= 5) stockClass += 'low-stock';
+                                else if (newStock <= 15) stockClass += 'warning-stock';
+                                else stockClass += 'in-stock';
+
+                                stockDisplay.className = stockClass;
+                            }
+
+                            // Update the button's data attribute
+                            const button = document.querySelector(`[data-id="${productId}"].update-stock-button`);
+                            if (button) {
+                                button.setAttribute('data-current-stock', newStock);
+                            }
+
+                            // Close the modal
+                            updateStockModal.style.display = 'none';
+
+                            // Refresh the page after a short delay
+                            setTimeout(() => window.location.reload(), 1000);
+                        } else {
+                            showToast(data.message || 'Error updating stock. Please try again.', 'error');
                         }
-                        
-                        // Update the button's data attribute
-                        const button = document.querySelector(`[data-id="${productId}"].update-stock-button`);
-                        if (button) {
-                            button.setAttribute('data-current-stock', newStock);
-                        }
-                        
-                        // Close the modal
-                        updateStockModal.style.display = 'none';
-                        
-                        // Refresh the page after a short delay
-                        setTimeout(() => window.location.reload(), 1000);
-                    } else {
-                        showToast(data.message || 'Error updating stock. Please try again.', 'error');
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    showToast('An error occurred while updating stock. Please try again.', 'error');
-                })
-                .finally(() => {
-                    setButtonLoading(submitButton, false);
-                });
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        showToast('An error occurred while updating stock. Please try again.', 'error');
+                    })
+                    .finally(() => {
+                        setButtonLoading(submitButton, false);
+                    });
             });
         }
 
@@ -471,12 +568,153 @@ try {
         });
         document.getElementById('sort').addEventListener('change', function() {
             const selected = this.value;
-            const url = new URL(window.location.href);
-            url.searchParams.set('sort', selected);
-            url.searchParams.set('page', 1); // Reset to first page on sort
-            window.location.href = url.toString();
+            const currentUrl = new URL(window.location);
+            if (selected) {
+                currentUrl.searchParams.set('sort', selected);
+            } else {
+                currentUrl.searchParams.delete('sort');
+            }
+            currentUrl.searchParams.set('page', 1); // Reset to page 1
+            window.location.href = currentUrl.toString();
+        });
+
+        // Search functionality
+        const searchInput = document.getElementById('search');
+        let searchTimeout;
+
+        searchInput.addEventListener('input', function() {
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(() => {
+                const searchValue = this.value.trim();
+                const currentUrl = new URL(window.location);
+
+                if (searchValue) {
+                    currentUrl.searchParams.set('search', searchValue);
+                } else {
+                    currentUrl.searchParams.delete('search');
+                }
+                currentUrl.searchParams.set('page', 1); // Reset to page 1
+                window.location.href = currentUrl.toString();
+            }, 500); // 500ms delay for better UX
+        });
+
+        // Clear filters functionality
+        document.getElementById('clear-filters').addEventListener('click', function() {
+            const currentUrl = new URL(window.location);
+            currentUrl.searchParams.delete('search');
+            currentUrl.searchParams.delete('sort');
+            currentUrl.searchParams.set('page', 1);
+            window.location.href = currentUrl.toString();
         });
     });
+
+    function setupEditButtons() {
+        document.querySelectorAll('.edit-product-button').forEach(button => {
+            button.addEventListener('click', function() {
+                const productId = this.getAttribute('data-id');
+
+                fetch('get_product_details.php?id=' + productId)
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            const product = data.product;
+                            document.getElementById('edit_product_id').value = product.id;
+                            document.getElementById('edit_product_name').value = product.name;
+                            document.getElementById('edit_product_category').value = product.category;
+                            document.getElementById('edit_product_description').value = product.description;
+                            document.getElementById('edit_product_price').value = product.price;
+                            document.getElementById('edit_stock_quantity').value = product.stock_quantity;
+
+                            document.getElementById('edit-product-modal').style.display = 'block';
+                        } else {
+                            showToast('Error loading product details: ' + (data.message || 'Unknown error'), 'error');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        showToast('An error occurred while loading product details.', 'error');
+                    });
+            });
+        });
+    }
+
+    function setupDeleteButtons() {
+        document.querySelectorAll('.delete-product-button').forEach(button => {
+            button.addEventListener('click', function() {
+                const productId = this.getAttribute('data-id');
+
+                showConfirmDialog('Are you sure you want to deactivate this product?', () => {
+                    fetch('process_delete_product.php', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/x-www-form-urlencoded',
+                            },
+                            body: 'product_id=' + productId
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.success) {
+                                showToast('Product deactivated successfully!', 'success');
+                                // Reload the page to show changes
+                                setTimeout(() => location.reload(), 1000);
+                            } else {
+                                showToast('Error deactivating product: ' + (data.message || 'Unknown error'), 'error');
+                            }
+                        })
+                        .catch(error => {
+                            console.error('AJAX Error deleting product:', error);
+                            showToast('An error occurred while deactivating the product.', 'error');
+                        });
+                });
+            });
+        });
+    }
+
+    function setupReactivateButtons() {
+        document.querySelectorAll('.reactivate-product-button').forEach(button => {
+            button.addEventListener('click', function() {
+                const productId = this.getAttribute('data-id');
+                fetch('process_toggle_product_status.php', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded',
+                        },
+                        body: 'product_id=' + productId + '&active=1'
+                    })
+                    .then(response => response.json()).then(data => {
+                        if (data.success) {
+                            showToast('Product reactivated successfully!', 'success');
+                            // Reload the page to show changes
+                            setTimeout(() => location.reload(), 1000);
+                        } else {
+                            showToast('Error reactivating product: ' + (data.message || 'Unknown error'), 'error');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        showToast('An error occurred while reactivating the product.', 'error');
+                    });
+            });
+        });
+    }
+
+    function setupUpdateStockButtons() {
+        document.querySelectorAll('.update-stock-button').forEach(button => {
+            button.addEventListener('click', function() {
+                const productId = this.getAttribute('data-id');
+                const currentStock = this.getAttribute('data-current-stock');
+                const productName = this.getAttribute('data-product-name');
+
+                document.getElementById('update_product_id').value = productId;
+                document.getElementById('product_name_display').value = productName;
+                document.getElementById('current_stock_display').value = currentStock;
+                document.getElementById('new_stock_quantity').value = currentStock;
+
+                document.getElementById('update-stock-modal').style.display = 'block';
+                document.getElementById('new_stock_quantity').focus();
+            });
+        });
+    }
 
     function closeStockModal() {
         document.getElementById('update-stock-modal').style.display = 'none';
@@ -502,14 +740,15 @@ try {
     }
 
     .pagination-link:hover {
-        background-color: #d1d5db;
-        /* gray-300 */
+        background: #e9ecef;
+        color: #2d1230;
+        transform: translateY(-1px);
     }
 
     .pagination-link.active {
-        background-color: #9f86c0;
-        /* purple-300 */
+        background: #3f1a41;
         color: white;
+        border-color: #3f1a41;
     }
 
     @keyframes fadeIn {
@@ -616,5 +855,105 @@ try {
     .action-buttons .button.small {
         font-size: 12px;
         padding: 4px 8px;
+    }
+
+    /* Filter Section Styles */
+    .filter-section {
+        display: flex;
+        gap: 20px;
+        align-items: end;
+        margin-bottom: 20px;
+        padding: 20px;
+        background: #f8f9fa;
+        border-radius: 8px;
+        border: 1px solid #e9ecef;
+    }
+
+    .filter-group {
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+    }
+
+    .filter-label {
+        font-weight: 500;
+        color: #3f1a41;
+        font-size: 0.9rem;
+    }
+
+    .filter-input,
+    .filter-select {
+        padding: 8px 12px;
+        border: 1px solid #ddd;
+        border-radius: 6px;
+        font-size: 14px;
+        background: white;
+        transition: border-color 0.3s ease;
+        min-width: 200px;
+    }
+
+    .filter-input:focus,
+    .filter-select:focus {
+        outline: none;
+        border-color: #3f1a41;
+        box-shadow: 0 0 0 2px rgba(63, 26, 65, 0.1);
+    }
+
+    .filter-input::placeholder {
+        color: #999;
+        font-style: italic;
+    }
+
+    .button.small {
+        padding: 8px 16px;
+        font-size: 0.85rem;
+        border-radius: 5px;
+        font-weight: 500;
+        transition: all 0.3s ease;
+    }
+
+    .button.secondary.small {
+        background-color: #6c757d;
+        color: white;
+        border: 1px solid #6c757d;
+    }
+
+    .button.secondary.small:hover {
+        background-color: #5a6268;
+        border-color: #545b62;
+        transform: translateY(-1px);
+    }
+
+    @media (max-width: 768px) {
+        .filter-section {
+            flex-direction: column;
+            gap: 15px;
+            align-items: stretch;
+        }
+
+        .filter-input,
+        .filter-select {
+            min-width: auto;
+            width: 100%;
+        }
+    }
+
+    /* Search Results Info */
+    .search-results-info {
+        background: #e8f4fd;
+        border: 1px solid #bee5eb;
+        border-radius: 6px;
+        padding: 12px 16px;
+        margin-bottom: 20px;
+        color: #0c5460;
+    }
+
+    .search-results-info p {
+        margin: 0;
+        font-size: 0.9rem;
+    }
+
+    .search-results-info strong {
+        color: #3f1a41;
     }
 </style>

@@ -392,13 +392,31 @@ body.admin-page {
     flex-shrink: 0;
 }
 
+.table-row.out-of-stock-row {
+    background: rgba(245, 227, 227, 0.5);
+    border-left: 4px solid rgba(139, 68, 68, 0.6);
+}
+
 .table-row.low-stock-row {
-    background: rgba(255, 243, 205, 0.3);
-    border-left: 4px solid #ffc107;
+    background: rgba(250, 240, 230, 0.5);
+    border-left: 4px solid rgba(165, 90, 0, 0.6);
+}
+
+.table-row.warning-stock-row {
+    background: rgba(255, 249, 230, 0.5);
+    border-left: 4px solid rgba(153, 105, 0, 0.6);
+}
+
+.table-row.out-of-stock-row:hover {
+    background: rgba(245, 227, 227, 0.7);
 }
 
 .table-row.low-stock-row:hover {
-    background: rgba(255, 243, 205, 0.5);
+    background: rgba(250, 240, 230, 0.7);
+}
+
+.table-row.warning-stock-row:hover {
+    background: rgba(255, 249, 230, 0.7);
 }
 
 
@@ -526,45 +544,57 @@ body.admin-page {
 }
 
 .status-pending {
-    background: #fff3cd;
-    color: #856404;
-    border: 1px solid #ffeaa7;
+    background: rgba(255, 249, 230, 0.9);
+    color: #6b4a00;
+    border: 1px solid rgba(153, 105, 0, 0.3);
 }
 
 .status-processing {
-    background: #cce5ff;
-    color: #0066cc;
-    border: 1px solid #99ccff;
+    background: rgba(230, 245, 255, 0.9);
+    color: #1a4d66;
+    border: 1px solid rgba(102, 178, 255, 0.3);
 }
 
 .status-shipping {
-    background: #e1f5fe;
-    color: #0277bd;
-    border: 1px solid #b3e5fc;
+    background: rgba(225, 245, 254, 0.9);
+    color: #1a4a5c;
+    border: 1px solid rgba(179, 229, 252, 0.4);
 }
 
 .status-delivered {
-    background: #d4edda;
-    color: #155724;
-    border: 1px solid #a3cfbb;
+    background: rgba(232, 245, 232, 0.9);
+    color: #1e3a1e;
+    border: 1px solid rgba(45, 90, 45, 0.3);
 }
 
 .status-cancelled {
-    background: #f8d7da;
-    color: #721c24;
-    border: 1px solid #f1aeb5;
+    background: rgba(245, 227, 227, 0.9);
+    color: #6b1f1f;
+    border: 1px solid rgba(139, 68, 68, 0.3);
 }
 
 .stock-badge.in-stock {
-    background: #d4edda;
-    color: #155724;
-    border: 1px solid #a3cfbb;
+    background: rgba(232, 245, 232, 0.9);
+    color: #1e3a1e;
+    border: 1px solid rgba(45, 90, 45, 0.3);
+}
+
+.stock-badge.out-of-stock {
+    background: rgba(245, 227, 227, 0.9);
+    color: #6b1f1f;
+    border: 1px solid rgba(139, 68, 68, 0.3);
 }
 
 .stock-badge.low-stock {
-    background: #fff3cd;
-    color: #856404;
-    border: 1px solid #ffeaa7;
+    background: rgba(250, 240, 230, 0.9);
+    color: #7a4200;
+    border: 1px solid rgba(165, 90, 0, 0.3);
+}
+
+.stock-badge.warning-stock {
+    background: rgba(255, 249, 230, 0.9);
+    color: #6b4a00;
+    border: 1px solid rgba(153, 105, 0, 0.3);
 }
 
 .category-badge {

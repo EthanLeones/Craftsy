@@ -176,13 +176,14 @@
 
 <section class="about-section artisans-section">
     <div class="about-content">
-        <div class="about-image">
-            <img src="images/insta-img.jpg" alt="Craftsy Nook Artisans Image">
-        </div>
+
         <div class="about-text">
             <h2>OUR ARTISANS</h2>
             <p>Behind every Craftsy Nook bag is a skilled artisan who has mastered the art of traditional handweaving and bag-making. Our artisans combine time-honored techniques with contemporary design to create pieces that are both beautiful and functional.</p>
             <p>We're proud to provide fair wages and sustainable employment to our team of artisans, empowering local Filipino cultural heritage while creating economic opportunities.</p>
+        </div>
+        <div class="about-image">
+            <img src="images/insta-img.jpg" alt="Craftsy Nook Artisans Image">
         </div>
     </div>
 </section>
