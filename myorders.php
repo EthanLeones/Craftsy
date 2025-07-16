@@ -10,9 +10,10 @@ $user_id = getCurrentUserId();
 
 if ($user_id) {
     try {
-        $conn = getDBConnection();        // Get orders for the user - ensure we only get one row per order
+        $conn = getDBConnection();        // Get orders for the user with sequential order numbers
         $stmt = $conn->prepare("
-            SELECT o.id, o.order_date, o.total_amount, o.status, o.created_at 
+            SELECT o.id, o.order_date, o.total_amount, o.status, o.created_at,
+                   ROW_NUMBER() OVER (ORDER BY o.created_at ASC) as user_order_number
             FROM orders o 
             WHERE o.user_id = ? AND (o.is_deleted = 0 OR o.is_deleted IS NULL)
             GROUP BY o.id
@@ -33,6 +34,7 @@ if ($user_id) {
             // Create a fresh copy of order data
             $order = [
                 'id' => $order_data['id'],
+                'user_order_number' => $order_data['user_order_number'],
                 'order_date' => $order_data['order_date'],
                 'total_amount' => $order_data['total_amount'],
                 'status' => $order_data['status'],
@@ -370,7 +372,7 @@ if ($user_id) {
                     <div class="order-card">
                         <div class="order-header">
                             <div class="order-info">
-                                <div class="order-id">Order #<?php echo htmlspecialchars($order['id']); ?></div>
+                                <div class="order-id">Order #<?php echo htmlspecialchars($order['user_order_number']); ?></div>
                                 <div class="order-date">
                                     <?php
                                     $order_date = $order['order_date'] ?? $order['created_at'];
