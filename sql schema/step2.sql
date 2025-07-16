@@ -39,17 +39,6 @@ CREATE TABLE `inquiry_threads` (
 
 -- --------------------------------------------------------
 
---
--- Table structure for table `newsletter_subscribers`
---
-
-CREATE TABLE `newsletter_subscribers` (
-  `id` int(11) NOT NULL,
-  `email` varchar(100) NOT NULL,
-  `status` enum('active','unsubscribed') DEFAULT 'active',
-  `created_at` timestamp NULL DEFAULT current_timestamp(),
-  `updated_at` timestamp NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
 
@@ -136,17 +125,6 @@ INSERT INTO `products` (`id`, `name`, `description`, `price`, `active`, `categor
 
 -- --------------------------------------------------------
 
---
--- Table structure for table `sales_tracking`
---
-
-CREATE TABLE `sales_tracking` (
-  `id` int(11) NOT NULL,
-  `date` date NOT NULL,
-  `total_sales` decimal(10,2) NOT NULL,
-  `total_orders` int(11) NOT NULL,
-  `created_at` timestamp NULL DEFAULT current_timestamp()
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
 
@@ -226,11 +204,6 @@ ALTER TABLE `inquiry_threads`
   ADD KEY `idx_inquiry_threads_user` (`user_id`);
 
 --
--- Indexes for table `newsletter_subscribers`
---
-ALTER TABLE `newsletter_subscribers`
-  ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `email` (`email`);
 
 --
 -- Indexes for table `orders`
@@ -256,11 +229,6 @@ ALTER TABLE `products`
   ADD PRIMARY KEY (`id`);
 
 --
--- Indexes for table `sales_tracking`
---
-ALTER TABLE `sales_tracking`
-  ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `unique_date` (`date`);
 
 --
 -- Indexes for table `users`
@@ -300,10 +268,6 @@ ALTER TABLE `inquiry_threads`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
--- AUTO_INCREMENT for table `newsletter_subscribers`
---
-ALTER TABLE `newsletter_subscribers`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `orders`
@@ -323,11 +287,6 @@ ALTER TABLE `order_items`
 ALTER TABLE `products`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=19;
 
---
--- AUTO_INCREMENT for table `sales_tracking`
---
-ALTER TABLE `sales_tracking`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `users`
