@@ -48,7 +48,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         } else {
             error_log("Login failed for username: " . $username);
 
-            // Check if user exists to provide more specific feedback
             if ($user) {
                 $_SESSION['alert_message'] = 'Incorrect password. Please try again.';
             } else {
@@ -62,7 +61,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         error_log("Login error: " . $e->getMessage());
         $_SESSION['alert_message'] = 'An unexpected error occurred during login.';
         $_SESSION['alert_type'] = 'error';
-        header('Location: error.php'); // Redirect to a generic error page for database errors
+        header('Location: error.php');
         exit();
     }
 } else {
