@@ -34,7 +34,120 @@ include 'header.php';
     </form>
 </div>
 
+<!-- No need for toast container since header.php handles toasts globally -->
+
 <script>
+    // Ensure showToast function exists - define it if not available
+    if (typeof showToast !== 'function') {
+        window.showToast = function(message, type = 'success') {
+            const existingToasts = document.querySelectorAll('.toast');
+            existingToasts.forEach(toast => toast.remove());
+
+            const toast = document.createElement('div');
+            toast.className = 'toast ' + type;
+            toast.innerHTML = `
+                <span>${message}</span>
+                <button onclick="this.parentElement.remove()">×</button>
+            `;
+            
+            document.body.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.classList.add('show');
+                setTimeout(() => {
+                    toast.classList.remove('show');
+                    setTimeout(() => {
+                        if (document.body.contains(toast)) {
+                            document.body.removeChild(toast);
+                        }
+                    }, 300);
+                }, 5000);
+            }, 100);
+        };
+    }
+
+    // Dynamic style injection like login page
+    if (!document.getElementById('toast-style-fp')) {
+        const style = document.createElement('style');
+        style.id = 'toast-style-fp';
+        style.textContent = `
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            left: auto;
+            transform: none;
+            min-width: 300px;
+            max-width: 450px;
+            padding: 14px 24px;
+            border-radius: 6px;
+            color: #fff;
+            font-size: 1rem;
+            z-index: 9999;
+            opacity: 0;
+            pointer-events: none;
+            background: #333;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            transition: opacity 0.3s, right 0.4s, top 0.3s;
+            display: flex !important;
+            align-items: center;
+            justify-content: space-between;
+            word-wrap: break-word;
+        }
+        .toast.show {
+            opacity: 1;
+            pointer-events: auto;
+            right: 20px;
+            top: auto;
+        }
+        .toast.success { background: #28a745; }
+        .toast.error { background: #dc3545; }
+        .toast.info { background: #007bff; }
+        .toast.warning { background: #f39c12; }
+        .toast button {
+            background: none !important;
+            border: none !important;
+            color: inherit !important;
+            font-size: 18px !important;
+            font-weight: bold !important;
+            margin-left: 10px !important;
+            cursor: pointer !important;
+            padding: 0 5px !important;
+            text-transform: none !important;
+            letter-spacing: normal !important;
+            transition: opacity 0.3s ease !important;
+            flex-shrink: 0;
+        }
+        .toast button:hover {
+            opacity: 0.7 !important;
+            background: none !important;
+            color: inherit !important;
+            transform: none !important;
+            box-shadow: none !important;
+        }
+        .toast:not(:first-of-type) {
+            bottom: calc(20px + (80px * var(--toast-index, 0)));
+        }
+        @media (max-width: 600px) {
+            .toast {
+                left: 50%;
+                right: auto;
+                transform: translateX(-50%);
+                min-width: 90vw;
+                max-width: 98vw;
+                font-size: 0.95rem;
+                padding: 12px 10px;
+            }
+            .toast.show {
+                right: auto;
+                left: 50%;
+                transform: translateX(-50%);
+            }
+        }
+        `;
+        document.head.appendChild(style);
+    }
+
     const emailForm = document.getElementById('forgot-email-form');
     const resetForm = document.getElementById('reset-password-form');
     const emailInput = document.getElementById('fp-email');
@@ -196,15 +309,7 @@ include 'header.php';
     }
 </style>
 
-
-
 <?php
-if (isset($_SESSION['alert'])) {
-    $alert_type = $_SESSION['alert']['type'];
-    $alert_message = $_SESSION['alert']['message'];
-    echo "<script>alert(\'" . addslashes($alert_message) . "\');</script>";
-    unset($_SESSION['alert']); // Clear the session variable
-}
+// Session alerts are already handled by header.php
+include 'footer.php';
 ?>
-
-<?php include 'footer.php'; ?>

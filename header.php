@@ -97,21 +97,43 @@ $current_page = basename($_SERVER['PHP_SELF']);
 
 <script>
 // Global Toast Notification Function
-function showToast(message, type) {
+function showToast(message, type = 'success') {
+    // Remove any existing toasts to prevent stacking issues
+    const existingToasts = document.querySelectorAll('.toast');
+    existingToasts.forEach(toast => {
+        if (toast.parentNode) {
+            toast.remove();
+        }
+    });
+
     const toast = document.createElement('div');
     toast.className = 'toast ' + type;
-    toast.textContent = message;
+    toast.innerHTML = `
+        <span>${message}</span>
+        <button onclick="this.parentElement.remove()">×</button>
+    `;
+    
     document.body.appendChild(toast);
+    
+    // Trigger show animation
     setTimeout(() => {
         toast.classList.add('show');
+        toast.style.opacity = '1';
+        toast.style.pointerEvents = 'auto';
+        
+        // Auto-remove after 5 seconds
         setTimeout(() => {
             toast.classList.remove('show');
+            toast.style.opacity = '0';
+            toast.style.pointerEvents = 'none';
+            
+            // Remove from DOM after transition
             setTimeout(() => {
                 if (document.body.contains(toast)) {
                     document.body.removeChild(toast);
                 }
             }, 300);
-        }, 3000);
+        }, 5000);
     }, 100);
 }
 </script>

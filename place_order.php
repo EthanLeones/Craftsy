@@ -2,32 +2,32 @@
 require_once 'includes/session.php';
 require_once 'config/database.php';
 
-requireLogin(); 
+requireLogin();
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Prevent duplicate form submissions
     $form_token = $_POST['form_token'] ?? '';
     $session_token = $_SESSION['form_token'] ?? '';
-    
+
     if (empty($form_token) || $form_token !== $session_token) {
         $_SESSION['alert'] = ['type' => 'danger', 'message' => 'Invalid form submission. Please try again.'];
         header('Location: checkout.php?error=invalid_token');
         exit();
     }
-    
+
     // Clear the token to prevent reuse
     unset($_SESSION['form_token']);
-    
+
     $user_id = getCurrentUserId();
     $shipping_address_id = $_POST['shipping_address'] ?? null;
     $payment_method = $_POST['payment_method'] ?? null;
 
-    $proof_of_payment_url = null; 
+    $proof_of_payment_url = null;
 
     if (($payment_method === 'bank_transfer' || $payment_method === 'gcash') && isset($_FILES['proof_of_payment']) && $_FILES['proof_of_payment']['error'] === UPLOAD_ERR_OK) {
         $file = $_FILES['proof_of_payment'];
-        $allowed_types = ['image/jpeg', 'image/png', 'image/gif'];
-        
+        $allowed_types = ['image/jpeg', 'image/png'];
+
         if (!in_array($file['type'], $allowed_types)) {
             $_SESSION['alert'] = ['type' => 'danger', 'message' => 'Invalid file type for proof of payment. Only JPG, PNG, GIF are allowed.'];
             header('Location: checkout.php?error=invalid_proof_type');
@@ -41,7 +41,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             exit();
         }
 
-        $upload_dir = 'images/proof/'; 
+        $upload_dir = 'images/proof/';
         $absolute_upload_dir = __DIR__ . '/' . $upload_dir;
 
         if (!file_exists($absolute_upload_dir)) {
@@ -75,10 +75,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     try {
         $conn = getDBConnection();
-        
+
         // Start transaction with proper isolation level to prevent race conditions
         $conn->beginTransaction();
-        
+
         // Lock the user's cart to prevent concurrent modifications
         $stmt_lock = $conn->prepare("SELECT 1 FROM cart WHERE user_id = ? FOR UPDATE");
         $stmt_lock->execute([$user_id]);
@@ -94,17 +94,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             exit();
         }
 
-        $total_amount = array_sum(array_map(function($item) { return $item['price'] * $item['quantity']; }, $cart_items));
+        $total_amount = array_sum(array_map(function ($item) {
+            return $item['price'] * $item['quantity'];
+        }, $cart_items));
 
         $stmt_address = $conn->prepare("SELECT * FROM user_addresses WHERE id = ? AND user_id = ?");
         $stmt_address->execute([$shipping_address_id, $user_id]);
         $shipping_address = $stmt_address->fetch(PDO::FETCH_ASSOC);
 
         if (!$shipping_address) {
-             $_SESSION['alert'] = ['type' => 'danger', 'message' => 'Invalid shipping address selected.'];
-             $conn->rollBack();
-             header('Location: checkout.php?error=invalid_address');
-             exit();
+            $_SESSION['alert'] = ['type' => 'danger', 'message' => 'Invalid shipping address selected.'];
+            $conn->rollBack();
+            header('Location: checkout.php?error=invalid_address');
+            exit();
         }
 
         $stmt_order = $conn->prepare("INSERT INTO orders (user_id, shipping_address_line1, shipping_address_line2, shipping_city, shipping_state_province, shipping_postal_code, shipping_country, shipping_contact_number, total_amount, payment_method, proof_of_payment_url, order_date, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW(), 'Pending')");
@@ -142,7 +144,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $_SESSION['alert'] = ['type' => 'success', 'message' => 'Order placed successfully!'];
         header('Location: order_confirmation.php?order_id=' . $order_id); // Redirect to confirmation page
         exit();
-
     } catch (PDOException $e) {
         $conn->rollBack();
         error_log("Error placing order: " . $e->getMessage());
@@ -150,9 +151,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         header('Location: checkout.php?error=db_error'); // Redirect back to checkout with error
         exit();
     }
-
 } else {
     header('Location: checkout.php');
     exit();
 }
-?> 

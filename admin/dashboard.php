@@ -79,7 +79,7 @@ try {
         SELECT id, name, stock_quantity, image_url 
         FROM products 
         WHERE stock_quantity <= ? 
-        AND stock_quantity > 0 
+        AND stock_quantity >=    0 
         AND active = 1 
         ORDER BY stock_quantity ASC 
         LIMIT $low_stock_limit OFFSET $low_stock_offset
